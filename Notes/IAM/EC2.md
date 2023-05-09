@@ -15,7 +15,7 @@ EC2
 * Only run once when the instance first starts
 * E.g. install updates, software, common files, etc
 * Runs as root user
-* T2.mcro – 1 cpu, 1 gb ram, ebs storage only, low to moderate network performance
+* T2.micro – 1 cpu, 1 gb ram, ebs storage only, low to moderate network performance
 * Windows 7 or windows 8 use .ppk for PuTTY and .prem for higher with OpenSSH
 * Instance may change public ip address when restarting. Private ipv4 never changes
 * You can use EC2 instance types which are optimized for different purposes
@@ -48,4 +48,4 @@ Use case:
 * 22 – SFTP upload file using SSH
 * 80 – HTTP access unsecured website
 * 443 – HTTPS access secured websites
-* 3389 – RDP (Remote desktop protocol)
+* a3389 – RDP (Remote desktop protocol)

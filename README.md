@@ -112,6 +112,7 @@ For more information about EBS volumes, you can refer to the [official AWS docum
 ![List of volumes](https://i.imgur.com/qchPRzf.png)
 
 * You can attach, detach volume from an EC2 instance
+
 ![Example of volume](https://i.imgur.com/xV1THSy.png)
 
 * You can also create snapshots of the volume. It is not necessary to detach volume while performing a snapshot, but recommended.
@@ -123,19 +124,27 @@ For more information about EBS volumes, you can refer to the [official AWS docum
 * Fast Snapshot Restore (FSR): forces a full initialization of snapshot to have 0 latency on first use. Useful if files are big. This feature can be expensive. 
 
 ##### Creating a snapshot from a volume
+
 ![Creating a snapshot from a volume](https://i.imgur.com/DrBs1G3.png)
 
 ##### Moving a snapshot to a different region
+
 ![Moving snapshot to different region](https://i.imgur.com/jq2TZql.png)
 
 ##### Creating a volume from snapshot
+
 ![Creating a volume from a snapshot](https://i.imgur.com/5pwAGiB.png)
 
 ##### Creating a retention rule
 1. Keeping deleted EBS Snapshots in the recycle bin for a day
+
 ![Creating a retention rule](https://i.imgur.com/KyB3vjh.png)
 
 2. Deleting snapshot 
+
 ![Deleting snapshot](https://i.imgur.com/YOUNiAC.png)
 
-3. 
+3. Resources in recycle bin can be recovered
+
+![Resources in recycle bin](https://i.imgur.com/7VJtdeA.png)
+

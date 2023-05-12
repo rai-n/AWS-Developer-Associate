@@ -5,8 +5,9 @@
 - [Elastic Compute Cloud](#aws-ec2)
 - [Elastic Block Store](#aws-ebs)
     1. [Volume types](#ebs-volume-types)
+    2. [Multi Attach](#ebs-multi-attach)
 - [Amazon Machine Image](#aws-ami)
-
+- [Elastic File System](#aws-efs)
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
 
@@ -28,24 +29,24 @@ For more information about IAM, you can refer to the [official AWS documentation
 #### User Groups
 An IAM user group is a collection of IAM users managed as a unit. You can use user groups to specify permissions for a collection of users, which can make it easier to manage the permissions for those users.
 
-![Example admin user group](https://i.imgur.com/bCEELJm.png)
+![](https://i.imgur.com/bCEELJm.png)
 
 #### Users
 An IAM user is an identity within your AWS account that has specific permissions for a single person or application. You can create IAM users and assign them individual security credentials (such as access keys or multi-factor authentication devices) or request temporary security credentials to provide users with access to AWS services and resources. 
 
-![Example user](https://i.imgur.com/Ejrs4cp.png)
+![](https://i.imgur.com/Ejrs4cp.png)
 
 #### Roles
 An IAM role is an AWS identity with permission policies that determine what the identity can and cannot do in AWS. You can use roles to delegate access to users, applications, or services that don't normally have access to your AWS resources. 
 
-![Example roles](https://i.imgur.com/jiGvOYQ.png)
+![](https://i.imgur.com/jiGvOYQ.png)
 
 #### Policies
 A policy is an object in AWS that, when associated with an identity or resource, defines their permissions. Policies determine what actions a user, role, or member of a user group can perform, on which AWS resources, and under what conditions.
 
 For more information about IAM, you can refer to the [official AWS documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
 
-![Example of AWS defined policies](https://i.imgur.com/QBWxQBZ.png)
+![](https://i.imgur.com/QBWxQBZ.png)
 
 <a name="aws-ec2"></a>
 ## Amazon Elastic Compute Cloud (EC2)
@@ -72,7 +73,7 @@ You can find more information about EC2 in the [official AWS documentation](http
 #### Creating an EC2 instance 
 - You can specify the hardware requirements and then launch the instance.
 
-![Creating an EC2 instance](https://i.imgur.com/IrTLbTr.png)
+![](https://i.imgur.com/IrTLbTr.png)
 
 ##### Displaying dummy data for instance
 ```
@@ -111,11 +112,11 @@ For more information about EBS volumes, you can refer to the [official AWS docum
 
 #### Volumes
 
-![List of volumes](https://i.imgur.com/qchPRzf.png)
+![](https://i.imgur.com/qchPRzf.png)
 
 * You can attach, detach volume from an EC2 instance
 
-![Example of volume](https://i.imgur.com/xV1THSy.png)
+![](https://i.imgur.com/xV1THSy.png)
 
 * You can also create snapshots of the volume. It is not necessary to detach volume while performing a snapshot, but recommended.
 
@@ -127,28 +128,28 @@ For more information about EBS volumes, you can refer to the [official AWS docum
 
 ##### Creating a snapshot from a volume
 
-![Creating a snapshot from a volume](https://i.imgur.com/DrBs1G3.png)
+![](https://i.imgur.com/DrBs1G3.png)
 
 ##### Moving a snapshot to a different region
 
-![Moving snapshot to different region](https://i.imgur.com/jq2TZql.png)
+![](https://i.imgur.com/jq2TZql.png)
 
 ##### Creating a volume from snapshot
 
-![Creating a volume from a snapshot](https://i.imgur.com/5pwAGiB.png)
+![](https://i.imgur.com/5pwAGiB.png)
 
 ##### Creating a retention rule
 1. Keeping deleted EBS Snapshots in the recycle bin for a day
 
-![Creating a retention rule](https://i.imgur.com/KyB3vjh.png)
+![](https://i.imgur.com/KyB3vjh.png)
 
 2. Deleting snapshot 
 
-![Deleting snapshot](https://i.imgur.com/YOUNiAC.png)
+![](https://i.imgur.com/YOUNiAC.png)
 
 3. Resources in recycle bin can be recovered
 
-![Resources in recycle bin](https://i.imgur.com/7VJtdeA.png)
+![](https://i.imgur.com/7VJtdeA.png)
 
 <a name=“ebs-volume-types”></a>
 ### Amazon EBS Volume Types
@@ -159,16 +160,30 @@ Amazon Elastic Block Store (EBS) provides block-level storage volumes for use wi
 ##### Use Cases
 1. General Purpose SSD (gp2): This is the default EBS volume type for Amazon EC2 instances. It is suitable for a broad range of workloads, including small to medium-sized databases, development and test environments, and boot volumes.
 2. Provisioned IOPS SSD (io1 and io2): This volume type is designed for I/O-intensive workloads such as large relational or NoSQL databases that require low latency and high performance.
-3. Throughput Optimized HDD (st1): This volume type is designed for frequently accessed, throughput-intensive workloads such as big data, data warehouses, and log processing.
-4. Cold HDD (sc1): This volume type is designed for less frequently accessed workloads such as colder data that requires fewer scans per day.
+3. Throughput Optimized HDD (st1): This volume type is designed for frequently accessed, throughput-intensive workloads such as big data, data warehouses, and log processing. (Standard throughput 1)
+4. Cold HDD (sc1): This volume type is designed for less frequently accessed workloads such as colder data that requires fewer scans per day. (Standard cold 1)
 
 ##### Tips
 1. Choose the right volume type: It is important to choose the right EBS volume type for your workload to ensure optimal performance and cost-effectiveness. Consider factors such as the required IOPS, throughput, and capacity when selecting a volume type.
 2. Monitor performance: Use Amazon CloudWatch to monitor the performance of your EBS volumes. This can help you identify any performance issues and take corrective action.
 For more information about Amazon EBS volume types, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html).
 
-@TODO HERE --> add hands on images maybe or after EBS multi-attach and EFS
+<a name=“ebs-multi-attach”></a>
+### Amazon EBS Multi-Attach
 
+#### Overview
+Amazon EBS Multi-Attach enables you to attach a single Provisioned IOPS SSD (io1 or io2) volume to multiple instances that are in the same Availability Zone. Each instance to which the volume is attached has full read and write permission to the shared volume. Multi-Attach makes it easier for you to achieve higher application availability in clustered Linux applications that manage concurrent write operations1.
+
+##### Use Cases
+Multi-Attach is useful for achieving higher application availability in clustered Linux applications that manage concurrent write operations1.
+
+##### Tips
+1. Multi-Attach enabled volumes can be attached to up to 16 Linux instances built on the Nitro System that are in the same Availability Zone.
+2. Multi-Attach is supported exclusively on Provisioned IOPS SSD (io1 and io2) volumes.
+3. Standard file systems, such as XFS and EXT4, are not designed to be accessed simultaneously by multiple servers, such as EC2 instances. Using Multi-Attach with a standard file system can result in data corruption or loss, so this is not safe for production workloads. You can use a clustered file system to ensure data resiliency and reliability for production workloads.
+4. Your applications must provide write ordering for the attached instances to maintain data consistency.
+5. Multi-Attach enabled volumes can’t be created as boot volumes.
+For more information about Amazon EBS Multi-Attach, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volumes-multi.html).
 
 <a name="aws-ami"></a>
 ### Amazon Machine Images (AMI)
@@ -193,15 +208,15 @@ For more information about Amazon Machine Images (AMI), you can refer to the [of
 ##### Creating an AMI
 1. Create an image from EC2 instance. You can add configurations such as installing Apache HTTPd or security software so that they do not need to be installed again when an instance is launched from an AMI.
 
-![Creating image from EC2 instance](https://i.imgur.com/rmoOR6V.png)
+![](https://i.imgur.com/rmoOR6V.png)
 
 2. Creating image
 
-![Creating image page](https://i.imgur.com/vcCtek1.png)
+![](https://i.imgur.com/vcCtek1.png)
 
 3. Launching instance using AMI
 
-![Launching instance using AMI](https://i.imgur.com/2S4L7s3.png)
+![](https://i.imgur.com/2S4L7s3.png)
 
 <a name="aws-instance-store"></a>
 ### Amazon EC2 Instance Store
@@ -219,3 +234,51 @@ An Amazon EC2 Instance Store provides temporary block-level storage for your EC2
 
 For more information about EC2 Instance Store, you can refer to the [official AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html).
 
+<a name=“aws-efs”></a>
+### Amazon Elastic File System (EFS)
+
+#### Overview
+Amazon Elastic File System (EFS) is a fully managed service that provides scalable file storage for use with Amazon EC2 instances. EFS is designed to be highly available and durable, automatically growing and shrinking as you add and remove files. This makes it easy to set up and use shared file storage in the cloud without having to worry about managing capacity or infrastructure. EFS works with EC2 instances in multi-AZ. It is 3x the price of a gpt2 volume.
+
+##### Use Cases
+Amazon EFS can be used for a variety of use cases, including:
+1. Simplifying DevOps: Share code and other files in a secure, organized way to increase DevOps agility and respond faster to customer feedback.
+2. Modernizing application development: Persist and share data from your AWS containers and serverless applications with zero management required.
+3. Enhancing content management systems: Simplify persistent storage for modern content management system (CMS) workloads.
+4. Accelerating data science: Easier to use and scale, Amazon EFS offers the performance and consistency needed for machine learning (ML) and big data analytics workloads.
+
+##### Tips
+1. Choose the right storage class: Amazon EFS offers several storage classes that allow you to optimize your costs based on your access patterns. For example, you can use the EFS Infrequent Access (IA) storage class to automatically move infrequently accessed files to lower-cost storage.
+3. Monitor performance: Use Amazon CloudWatch to monitor the performance of your EFS file systems. This can help you identify any performance issues and take corrective action.
+4. Use lifecycle policies: You can use lifecycle policies to automatically transition files between storage classes based on their age. This can help you reduce your storage costs by automatically moving older, less frequently accessed files to lower-cost storage.
+For more information about Amazon EFS, you can refer to the official [AWS documentation](https://aws.amazon.com/efs/).
+
+##### Creating an Elastic File System
+
+![](https://i.imgur.com/EvmG6Dj.png)
+
+##### Configuring mount targets 
+![](https://i.imgur.com/qBWtVw0.png)
+
+##### Created EFS 
+
+![](https://i.imgur.com/7unMxN0.png)
+
+##### Launching instance with EFS mounted 
+* A subnet has to be selected
+* EFS can be mounted with security groups created and attached automatically to the file system and instance. 
+* EFS can be mounted with the required user data script containing `efs-utils`.
+
+![](https://i.imgur.com/NF10kmo.png)
+
+##### Launched instances in different availability zones
+
+![](https://i.imgur.com/pZz7vrF.png)
+
+#### Relevant security groups are automatically attached to the EFS availability zones
+
+![](https://i.imgur.com/d7ijFrB.png)
+
+#### While connected to the instance, you can then use the file system
+
+![](https://i.imgur.com/Q3bvhdS.png)

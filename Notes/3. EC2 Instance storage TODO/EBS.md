@@ -10,4 +10,4 @@
 * It's locked to an Availability Zone, to move it you need to first snapshot it 
 
 * You have to provision the size of the volume before hand like GB and IOPS and pay for provisioned capacity
-* "Delete on termination" attribute. By default the root EBS volume is deleted. By default, any other attached BS volumes is not deleted
+* "Delete on termination" attribute. By default the root EBS volume is deleted. By default, any other attached BS volumes is not deleted.

@@ -2,8 +2,10 @@
 
 ## Table of Contents
 - [Identity and Access Management](#aws-iam)
-- [Elastic Compute Cloud](#ec2-overview)
+- [Elastic Compute Cloud](#aws-ec2)
 - [Elastic Block Store](#aws-ebs)
+    1. [Volume types](#ebs-volume-types)
+- [Amazon Machine Image](#aws-ami)
 
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
@@ -45,7 +47,7 @@ For more information about IAM, you can refer to the [official AWS documentation
 
 ![Example of AWS defined policies](https://i.imgur.com/QBWxQBZ.png)
 
-<a name="ec2-overview"></a>
+<a name="aws-ec2"></a>
 ## Amazon Elastic Compute Cloud (EC2)
  
 #### Overview
@@ -147,4 +149,73 @@ For more information about EBS volumes, you can refer to the [official AWS docum
 3. Resources in recycle bin can be recovered
 
 ![Resources in recycle bin](https://i.imgur.com/7VJtdeA.png)
+
+<a name=“ebs-volume-types”></a>
+### Amazon EBS Volume Types
+
+#### Overview
+Amazon Elastic Block Store (EBS) provides block-level storage volumes for use with Amazon EC2 instances. EBS volumes are highly available and reliable storage volumes that can be attached to any running instance in the same Availability Zone. EBS volumes come in several types, each optimized for a particular use case. These include General Purpose SSD (gp2), Provisioned IOPS SSD (io1 and io2), Throughput Optimized HDD (st1), and Cold HDD (sc1).
+
+##### Use Cases
+1. General Purpose SSD (gp2): This is the default EBS volume type for Amazon EC2 instances. It is suitable for a broad range of workloads, including small to medium-sized databases, development and test environments, and boot volumes.
+2. Provisioned IOPS SSD (io1 and io2): This volume type is designed for I/O-intensive workloads such as large relational or NoSQL databases that require low latency and high performance.
+3. Throughput Optimized HDD (st1): This volume type is designed for frequently accessed, throughput-intensive workloads such as big data, data warehouses, and log processing.
+4. Cold HDD (sc1): This volume type is designed for less frequently accessed workloads such as colder data that requires fewer scans per day.
+
+##### Tips
+1. Choose the right volume type: It is important to choose the right EBS volume type for your workload to ensure optimal performance and cost-effectiveness. Consider factors such as the required IOPS, throughput, and capacity when selecting a volume type.
+2. Monitor performance: Use Amazon CloudWatch to monitor the performance of your EBS volumes. This can help you identify any performance issues and take corrective action.
+For more information about Amazon EBS volume types, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html).
+
+@TODO HERE --> add hands on images maybe or after EBS multi-attach and EFS
+
+
+<a name="aws-ami"></a>
+### Amazon Machine Images (AMI)
+
+#### Overview
+An [Amazon Machine Image (AMI)](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) is a pre-configured virtual machine image that you can use to launch an EC2 instance. AMIs include the operating system, application server, and any additional software needed to run your application. You can create your own custom AMIs or choose from thousands of pre-built AMIs provided by AWS and the AWS Marketplace.
+
+##### Use Cases
+- Launching EC2 instances: You can use an AMI to launch an EC2 instance with the operating system and software configuration that you need for your application.
+- Sharing configurations: You can share your custom AMIs with other AWS accounts, allowing them to launch EC2 instances with the same configuration as yours.
+
+##### Tips
+- Choose the right AMI: When launching an EC2 instance, it is important to choose the right AMI for your needs. Consider factors such as the operating system, software packages, and security settings when selecting an AMI.
+- Keep your AMIs up to date: It is important to keep your custom AMIs up to date with the latest security patches and software updates. You can create new versions of your AMIs with updated software and use them to launch new EC2 instances.
+- AMIs are built for a specific region and can be copied across.
+For more information about Amazon Machine Images (AMI), you can refer to the [official AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
+
+##### Differences
+- "Create image": exact copy of the software.
+- "Template": exact copy of the EC2 hardware, without software configuration.
+- "Create more like this": opens EC2 wizard, without software configuration
+##### Creating an AMI
+1. Create an image from EC2 instance. You can add configurations such as installing Apache HTTPd or security software so that they do not need to be installed again when an instance is launched from an AMI.
+
+![Creating image from EC2 instance](https://i.imgur.com/rmoOR6V.png)
+
+2. Creating image
+
+![Creating image page](https://i.imgur.com/vcCtek1.png)
+
+3. Launching instance using AMI
+
+![Launching instance using AMI](https://i.imgur.com/2S4L7s3.png)
+
+<a name="aws-instance-store"></a>
+### Amazon EC2 Instance Store
+
+#### Overview
+An Amazon EC2 Instance Store provides temporary block-level storage for your EC2 instance. This storage is located on disks that are physically attached to the host computer. Instance store is ideal for temporary storage of information that changes frequently, such as buffers, caches, scratch data, and other temporary content. It can also be used to store temporary data that you replicate across a fleet of instances, such as a load-balanced pool of web servers.
+
+##### Use Cases
+- Temporary storage: You can use instance store for temporary storage of information that changes frequently, such as buffers, caches, scratch data, and other temporary content.
+- Replicated data: You can use instance store to store temporary data that you replicate across a fleet of instances, such as a load-balanced pool of web servers.
+
+##### Tips
+- Data persistence: The data on an instance store volume persists only during the lifetime of its associated instance. If an instance reboots (intentionally or unintentionally), data in the instance store persists. However, data in the instance store is lost under any of the following circumstances: The underlying disk drive fails; The instance stops; The instance hibernates; The instance terminates. Therefore, do not rely on instance store for valuable, long-term data.
+- Choose the right instance type: The size of the instance store available and the type of hardware used for the instance store volumes are determined by the instance type. Choose an instance type that provides the appropriate amount of instance store for your needs.
+
+For more information about EC2 Instance Store, you can refer to the [official AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html).
 

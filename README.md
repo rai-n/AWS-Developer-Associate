@@ -8,6 +8,7 @@
     2. [Multi Attach](#ebs-multi-attach)
 - [Amazon Machine Image](#aws-ami)
 - [Elastic File System](#aws-efs)
+- [Elastic Load Balancing](#aws-elb)
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
 
@@ -163,7 +164,7 @@ Amazon Elastic Block Store (EBS) provides block-level storage volumes for use wi
 3. Throughput Optimized HDD (st1): This volume type is designed for frequently accessed, throughput-intensive workloads such as big data, data warehouses, and log processing. (Standard throughput 1)
 4. Cold HDD (sc1): This volume type is designed for less frequently accessed workloads such as colder data that requires fewer scans per day. (Standard cold 1)
 
-##### Tips
+##### Tips  
 1. Choose the right volume type: It is important to choose the right EBS volume type for your workload to ensure optimal performance and cost-effectiveness. Consider factors such as the required IOPS, throughput, and capacity when selecting a volume type.
 2. Monitor performance: Use Amazon CloudWatch to monitor the performance of your EBS volumes. This can help you identify any performance issues and take corrective action.
 For more information about Amazon EBS volume types, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html).
@@ -279,6 +280,37 @@ For more information about Amazon EFS, you can refer to the official [AWS docume
 
 ![](https://i.imgur.com/d7ijFrB.png)
 
-#### While connected to the instance, you can then use the file system
+#### While connected to the instance, you can then use the file system and access its contents from instances in different availability zones
 
 ![](https://i.imgur.com/Q3bvhdS.png)
+
+<a name=“aws-elb”></a>
+### Amazon Elastic Load Balancer (ELB)
+
+#### Overview
+Amazon Elastic Load Balancer (ELB) is a fully managed service that automatically distributes incoming application traffic across multiple targets and virtual appliances in one or more Availability Zones (AZs). ELB is designed to improve application scalability and availability by distributing traffic to healthy targets and automatically scaling resources as needed. With ELB, you can secure your applications with integrated certificate management, user-authentication, and SSL/TLS decryption.
+
+##### Use Cases
+Amazon ELB can be used for a variety of use cases, including:
+1. Modernizing applications with serverless and containers: Scale modern applications to meet demand without complex configurations or API gateways.
+2. Improving hybrid cloud network scalability: Load balance across AWS and on-premises resources using a single load balancer.
+3. Retaining your existing network appliances: Deploy network appliances from your preferred vendor while taking advantage of the scale and flexibility of the cloud1.
+
+##### Tips
+1. Monitor performance: Use Amazon CloudWatch to monitor the health and performance of your applications in real-time, uncover bottlenecks, and maintain SLA compliance.
+2. Choose the right type of load balancer: Amazon ELB offers several types of load balancers, including Application Load Balancer, Gateway Load Balancer, and Network Load Balancer. Choose the type that best fits your needs.
+
+For more information about Amazon EFS, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/).
+
+<a name=“aws-alb”></a>
+### Amazon Application Load Balancer (ALB)
+
+#### Overview
+Amazon Application Load Balancer (ALB) is a feature of Elastic Load Balancing that operates at the request level (layer 7), routing traffic to targets (EC2 instances, containers, IP addresses, and Lambda functions) based on the content of the request. It is ideal for advanced load balancing of HTTP and HTTPS traffic and provides advanced request routing targeted at delivery of modern application architectures, including microservices and container-based applications. ALB simplifies and improves the security of your application by ensuring that the latest SSL/TLS ciphers and protocols are used at all times.
+
+##### Use Cases
+Amazon ALB can be used for a variety of use cases, including:
+1. Load balancing HTTP/HTTPS traffic: You can load balance HTTP/HTTPS traffic to targets such as Amazon EC2 instances, microservices, and containers based on request attributes (such as X-Forwarded-For headers).
+2. Improving application security: When using Amazon Virtual Private Cloud (VPC), you can create and manage security groups associated with Elastic Load Balancing to provide additional networking and security options. You can configure an ALB to be Internet facing or create a load balancer without public IP addresses to serve as an internal (non-internet-facing) load balancer.
+
+For more information about Amazon EFS, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/).

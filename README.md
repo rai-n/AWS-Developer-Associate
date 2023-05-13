@@ -9,6 +9,8 @@
 - [Amazon Machine Image](#aws-ami)
 - [Elastic File System](#aws-efs)
 - [Elastic Load Balancing](#aws-elb)
+    1. [Application Load Balancing](#aws-alb)
+    )
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
 

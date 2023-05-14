@@ -80,6 +80,8 @@ You can find more information about EC2 in the [official AWS documentation](http
 
 ##### Displaying dummy data for instance
 ```
+#!/bin/bash
+# install httpd (Linux 2 version)
 yum update -y
 yum install -y httpd
 systemctl start httpd
@@ -316,3 +318,47 @@ Amazon ALB can be used for a variety of use cases, including:
 2. Improving application security: When using Amazon Virtual Private Cloud (VPC), you can create and manage security groups associated with Elastic Load Balancing to provide additional networking and security options. You can configure an ALB to be Internet facing or create a load balancer without public IP addresses to serve as an internal (non-internet-facing) load balancer.
 
 For more information about Amazon EFS, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/).
+
+#### Creating an Application Load Balancer
+
+I created two EC2 instances to demonstrate the load balancers working.
+
+![](https://i.imgur.com/qlbfImL.png)
+
+1. I created an Application Load Balancer
+    - This is for HTTP and HTTPS kind of traffic.
+    - Network Load balancer is for TCP, UDP or TLS and useful for maintaining low latencies.
+    - Gateway Load Balancer  
+
+![](https://i.imgur.com/mQ7xdLx.png)
+
+2. I added some configuration to the ALB
+    - I selected internet facing, IPv4 config. 
+    - I created a security group to allow all HTTP traffic. 
+    - I selected all availability zones so the ALB routes traffic in all these regions.
+
+![](https://i.imgur.com/7IXnlhH.png)
+
+3. I then created an instance target group and assigned the two EC2 instances so the ALB can automatically route traffic between those instances.
+
+![](https://i.imgur.com/K89eC0P.png)
+![](https://i.imgur.com/uwKQ5Zh.png)
+![](https://i.imgur.com/cfDLEXh.png)
+
+4. Once the ALB is launched, I can visit the public DNS on a browser, which load balances and redirects to different instances via the target group.
+    - If I stop an instance, that instance would no longer be healthy in the target group and the user would no longer be directed to it via the ALB.
+
+![](https://i.imgur.com/PURYuUC.png)
+![](https://i.imgur.com/vX72rgz.png)
+
+5. To ensure that the instances cannot be accessed unless it is getting an inbound request from ALB's security group, I added it as an HTTP inbound rule on port 80.
+    - This is an added network security feature.
+
+![](https://i.imgur.com/DN65xM3.png)
+
+6. You can also add complex rules in the ALB for handling requests to simplify deployment and manage some of the routing logic from the application to the load balancer, as well as reducing duplicating routing logic across multiple instances of the application. 
+    - For example, I can set an `IF Path is /error THEN Return fixed response 404 with message 'Not found page'` rule as a fallback page.
+
+![](https://i.imgur.com/rK0jtes.png)
+![](https://i.imgur.com/kPNdOgp.png)
+![](https://i.imgur.com/edY8o2i.png)

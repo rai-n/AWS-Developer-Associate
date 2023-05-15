@@ -10,6 +10,10 @@
 - [Elastic File System](#aws-efs)
 - [Elastic Load Balancing](#aws-elb)
     1. [Application Load Balancing](#aws-alb)
+    2. [Network Load Balancing](#aws-nlb)
+    3. [Gateway Load Balancing](#aws-gwlb)
+    4. [Sticky Sessions](#aws-elb-sticky-sessions)
+    5. [Cross-Zone Load Balancing](#aws-elb-cross-zone-load-balancing)
 
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
@@ -319,7 +323,7 @@ Amazon ALB can be used for a variety of use cases, including:
 
 For more information about Amazon EFS, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/).
 
-#### Creating an Application Load Balancer
+#### Creating an Application Load Balancer  
 
 I created two EC2 instances to demonstrate the load balancers working.
 
@@ -357,8 +361,96 @@ I created two EC2 instances to demonstrate the load balancers working.
 ![](https://i.imgur.com/DN65xM3.png)
 
 6. You can also add complex rules in the ALB for handling requests to simplify deployment and manage some of the routing logic from the application to the load balancer, as well as reducing duplicating routing logic across multiple instances of the application. 
-    - For example, I can set an `IF Path is /error THEN Return fixed response 404 with message 'Not found page'` rule as a fallback page.
+    - For example, I can set an `IF Path is /error THEN Return fixed response 404 with message 'Not found page'` rule as a fallback page. 
 
 ![](https://i.imgur.com/rK0jtes.png)
 ![](https://i.imgur.com/kPNdOgp.png)
 ![](https://i.imgur.com/edY8o2i.png)
+
+<a name=“aws-nlb”></a>
+### Amazon Network Load Balancer (NLB)
+
+#### Overview
+A Network Load Balancer (NLB) functions at the layer 4 of the Open Systems Interconnection (OSI) model. It can handle millions of requests per second. After the load balancer receives a connection request, it selects a target from the target group for the default rule.
+
+##### Use Cases
+Some best use cases for Network Load Balancer include:
+
+1. When you need to seamlessly support spiky or high-volume inbound TCP requests.
+2. When you need to support a static or elastic IP address.
+3. If you are using container services and/or want to support more than one port on an EC2 instance. NLB is especially well suited to ECS (The Amazon EC2 Container Service). 
+
+##### Tips
+1. To increase the fault tolerance of your applications, you can enable multiple Availability Zones for your load balancer and ensure that each target group has at least one target in each enabled Availability Zone.
+
+For more information about Amazon NLB, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/).
+
+#### Creating an Network Load Balancer 
+    - Network Load balancer is for TCP, UDP or TLS and useful for maintaining low latencies.
+    - Latency ~ 100ms (vs 400 ms for ALB).
+    - NLB has one static IP per AZ, and supports assigning Elastic IP.
+    - Target group includes routing EC2 instances, private IP Addresses, Application Load Balancer.
+    - Health Checks support TCP, HTTP and HTTPS protocol.
+    - The general flow for creating a NLB is same as creating an ALB except the use of TCP or UDP. 
+    - NBL itself does not have security group unlike ALB so you control access using the security groups attached to the EC2 instances using the source IP. You can add rules to the security group of the EC2 instances to allow traffic from NBL.
+
+<a name=“aws-gwlb”></a>
+## Amazon Gateway Load Balancer (GWLB)
+
+#### Overview
+A Gateway Load Balancer (GWLB) functions at the layer 3 of the Open Systems Interconnection (OSI) model. It is a service that makes it easy and cost-effective to deploy, scale, and manage the availability of third-party virtual appliances. These appliances include firewalls (FW), intrusion detection and prevention systems, and deep packet inspection systems in the cloud.
+
+##### Use Cases
+With Gateway Load Balancer, you can easily add or remove advanced network functionality without extra management overhead. It provides the bump-in-the-wire technology you need to ensure all traffic to a public endpoint is first sent to the appliance before your application. Some key scenarios that you can accomplish using Gateway Load Balancer include:
+1. Firewalls
+2. Advanced packet analytics
+3. Intrusion detection and prevention systems
+4. Traffic mirroring
+5. DDoS protection
+6. Custom appliances
+
+##### Tips
+1. Tune TCP keep-alive or timeout values to support long-lived TCP flows.
+
+For more information about Amazon GWLB, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticloadbalancing/gateway-load-balancer/).
+
+#### Creating a Gateway Load Balancer
+    - Route tables are modified in the VPC and traffic is routed to a Gateway Load Balancer which spreads the traffic to some target group 3rd party security virtual appliances. If fine, the GWLB gets a return response and the traffic is sent to the destination application. Otherwise, the request is dropped.
+    - Uses GENEVE protocol on port 6081.
+
+<a name=“aws-elb-sticky-sessions”></a>
+## Amazon Elastic Load Balancer (ELB) - Sticky Sessions
+
+### Overview
+Sticky sessions, also known as session affinity, is a feature of Amazon Elastic Load Balancer (ELB) that enables the load balancer to bind a user’s session to a specific target. This ensures that all requests from the user during the session are sent to the same target. This feature is useful for servers that maintain state information in order to provide a continuous experience to clients. To use sticky sessions, the client must support cookies.
+
+##### Use Cases
+1. Sticky sessions can be more efficient because unique session-related data does not need to be migrated from server to server. For each request from the same client, the load balancer processes the request to the same web server each time, where data is stored and updated as long as the session exists.
+
+#### Tips
+1. Application Load Balancers support both duration-based cookies and application-based cookies.
+2. Sticky sessions are enabled at the target group level.
+3. The key to managing sticky sessions is determining how long your load balancer should consistently route the user’s request to the same target.
+
+For more information about Amazon ELB Sticky Sessions, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html)
+
+<a name=“aws-elb-cross-zone-load-balancing”></a>
+### Amazon Elastic Load Balancer (ELB) - Cross-Zone Load Balancing
+
+#### Overview
+Cross-zone load balancing is a feature of Amazon Elastic Load Balancer (ELB) that enables the load balancer to distribute incoming traffic evenly across all registered targets in all enabled Availability Zones. When cross-zone load balancing is disabled, each load balancer node distributes traffic only across the registered targets in its Availability Zone.
+
+##### Pricing
+- ALB has cross zone load balancing enabled by default and concurs no charges for inter AZ data transfer.
+- NLB & GWLB has cross zone load balancing disabled by default and concurs charges for inter AZ data if enabled.
+- Classic load balancing has it disabled by default, and concurs no charges for inter AZ data if enabled.
+![](https://i.imgur.com/RrEodKg.png)
+
+##### Use Cases
+1. Cross-zone load balancing reduces the need to maintain equivalent numbers of instances in each enabled Availability Zone and improves your application’s ability to handle the loss of one or more instances. However, it is still recommended that you maintain approximately equivalent numbers of instances in each enabled Availability Zone for higher fault tolerance.
+
+##### Tips
+1. When you create a Classic Load Balancer, the default for cross-zone load balancing depends on how you create the load balancer. With the API or CLI, cross-zone load balancing is disabled by default. With the AWS Management Console, the option to enable cross-zone load balancing is selected by default (but can be disabled at the Target Group level).
+2. After you create a Classic Load Balancer, you can enable or disable cross-zone load balancing at any time.
+
+For more information about Amazon ELB Cross-Zone Load Balancing, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#cross-zone-load-balancing)

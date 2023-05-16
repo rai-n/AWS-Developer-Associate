@@ -514,14 +514,29 @@ For more information about Amazon ELB Connection Draining, you can refer to the 
 ### Amazon Elastic Load Balancer (ELB) - Auto Scaling Groups
 
 #### Overview
-Amazon Elastic Load Balancer (ELB) integrates with Amazon EC2 Auto Scaling to help you to insert an Application Load Balancer, Network Load Balancer, Classic Load Balancer, or Gateway Load Balancer in front of your Auto Scaling group. When you attach a load balancer to your Auto Scaling group, this registers the group with the load balancer, which acts as a single point of contact for all incoming web traffic to your Auto Scaling group.
+Amazon Elastic Load Balancer (ELB) integrates with Amazon EC2 Auto Scaling to help you to insert an Application Load Balancer, Network Load Balancer, Classic Load Balancer, or Gateway Load Balancer in front of your Auto Scaling group. When you attach a load balancer to your Auto Scaling group, this registers the group with the load balancer, which acts as a single point of contact for all incoming web traffic to your Auto Scaling group. Auto Scaling groups itself is free but you are charged for the underlying hardware provisioned.
 
 ##### Use Cases
 1. Instances that are launched by your Auto Scaling group are automatically registered with the load balancer. Likewise, instances that are terminated by your Auto Scaling group are automatically deregistered from the load balancer.
 2. After attaching a load balancer to your Auto Scaling group, you can configure your Auto Scaling group to use Elastic Load Balancing metrics (such as the Application Load Balancer request count per target) to scale the number of instances in the group as demand fluctuates.
+3. You can set a minimum and maximum capacity as well as setting a desired capacity of EC2 instances. 
+4. You can also use CloudWatch Alarms to scale an ASG based on metrics such as "Average CPU" or other custom metrics.
 
 ##### Tips
 1. You can attach an Elastic Load Balancing load balancer to your Auto Scaling group at any time. This registers the group with the load balancer, which acts as a single point of contact for all incoming web traffic to your Auto Scaling group.
 2. Optionally, you can add Elastic Load Balancing health checks to your Auto Scaling group so that Amazon EC2 Auto Scaling can identify and replace unhealthy instances based on these additional health checks.
 
 For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)
+
+##### Creating an Auto Scaling group
+1. Define the launch template with AMI type, instance type, key pair, network settings, storage and more.
+
+![](https://i.imgur.com/LFc01QT.png)
+
+2. Choose the network, AZ and subnets the ASG can be launched on.
+
+![](https://i.imgur.com/YcEgaRV.png)
+
+3. You can use launch template or override it to specify instance attributes, manually add instance types and have a mix of on-demand and spot instances.
+
+![](https://i.imgur.com/WxYBLbb.png)

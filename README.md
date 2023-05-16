@@ -14,6 +14,9 @@
     3. [Gateway Load Balancing](#aws-gwlb)
     4. [Sticky Sessions](#aws-elb-sticky-sessions)
     5. [Cross-Zone Load Balancing](#aws-elb-cross-zone-load-balancing)
+    6. [SSL/TLS Certificates](aws-elb-ssl-certificates)
+    7. [Connection draining](#aws-elb-connection-draining)
+    8. [Auto scaling groups](#aws-elb-auto-scaling-groups)
 
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
@@ -454,3 +457,71 @@ Cross-zone load balancing is a feature of Amazon Elastic Load Balancer (ELB) tha
 2. After you create a Classic Load Balancer, you can enable or disable cross-zone load balancing at any time.
 
 For more information about Amazon ELB Cross-Zone Load Balancing, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#cross-zone-load-balancing)
+
+<a name=“aws-elb-ssl-certificates”></a>
+
+## Amazon Elastic Load Balancer (ELB) - SSL Certificates
+
+### Overview
+An SSL/TLS certificate is required for your Amazon Elastic Load Balancer (ELB) if you use HTTPS (SSL or TLS) for your front-end listener. The load balancer uses the certificate to terminate the connection and then decrypt requests from clients before sending them to the instances. The SSL and TLS protocols use an X.509 certificate (SSL/TLS server certificate) to authenticate both the client and the back-end application.
+
+#### Use Cases
+You can manage certificates using AWS Certificate Manager (ACM), which integrates with Elastic Load Balancing so that you can deploy the certificate on your load balancer.
+Alternatively, you can create or import your own certificates using a tool that supports the SSL and TLS protocols, such as OpenSSL.
+
+#### Tips
+1. When you create a certificate for use with your load balancer, you must specify a domain name. The domain name on the certificate must match the custom domain name record so that we can verify the TLS connection.
+2. You can use an asterisk (*) as a wild card to protect several site names in the same domain when requesting a wild-card certificate.
+3. ALB and NLB can present multiple certificates through the same secure listener using Server Name Indication (SNI), which enables it to support multiple secure websites using a single secure listener. CLB however only supports one SSL certificate and require multiple CLB for multiple hostname with multiple SSL certificates.
+
+For more information about Amazon ELB SSL Certificates, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/ssl-server-cert.html)
+
+##### Adding SSL certificate
+1. Select your load balancer.
+
+![](https://i.imgur.com/eEbmY8I.png)
+2. In the Listeners tab, choose Add listener.
+
+![](https://i.imgur.com/0dANQJI.png)
+
+3. For Protocol, choose HTTPS.
+4. For Default actions, choose Forward to and then choose the target group for your instances.
+5. Choose either:
+    - Choose an existing certificate from AWS Certificate Manager (ACM): Select this option to use a certificate that you already requested or imported into ACM.
+    - Import a new SSL/TLS certificate: Select this option to import a certificate into ACM for use with this load balancer. You must specify the certificate and private key in PEM format and the certificate chain in PEM format.
+6. Choose Save.
+7. After you add the HTTPS listener, you can update your DNS records to point to the DNS name of your load balancer. The DNS name is displayed in the Description tab for your load balancer.
+
+For more detailed instructions and information about adding an SSL certificate to an Amazon ELB, you can refer to the official AWS documentation.
+
+<a name=“aws-elb-connection-draining”></a>
+### Amazon Elastic Load Balancer (ELB) - Connection Draining
+
+#### Overview
+Connection Draining is a feature of Amazon Elastic Load Balancer (ELB) that ensures that a Classic Load Balancer stops sending requests to instances that are de-registering or unhealthy, while keeping the existing connections open. This enables the load balancer to complete in-flight requests made to instances that are de-registering or unhealthy. It is also known as "Deregistration delay" for ALB and NLB.
+
+##### Use Cases
+1. When an instance fails health checks, the ELB will not send any new requests to the unhealthy instance. However, it will still allow existing (in-flight) requests to complete for the duration of the configured timeout.
+2. Connection Draining can be used to prevent breaking open network connections while taking an instance out of service, updating its software, or replacing it with a fresh instance that contains updated software.
+
+##### Tips
+1. You can enable Connection Draining for your load balancer at any time and specify a maximum time for the load balancer to keep connections alive before reporting the instance as de-registered.
+2. When the maximum time limit is reached, the load balancer forcibly closes connections to the de-registering instance.
+
+For more information about Amazon ELB Connection Draining, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/config-conn-drain.html)
+
+<a name=“aws-elb-auto-scaling-groups”></a>
+### Amazon Elastic Load Balancer (ELB) - Auto Scaling Groups
+
+#### Overview
+Amazon Elastic Load Balancer (ELB) integrates with Amazon EC2 Auto Scaling to help you to insert an Application Load Balancer, Network Load Balancer, Classic Load Balancer, or Gateway Load Balancer in front of your Auto Scaling group. When you attach a load balancer to your Auto Scaling group, this registers the group with the load balancer, which acts as a single point of contact for all incoming web traffic to your Auto Scaling group.
+
+##### Use Cases
+1. Instances that are launched by your Auto Scaling group are automatically registered with the load balancer. Likewise, instances that are terminated by your Auto Scaling group are automatically deregistered from the load balancer.
+2. After attaching a load balancer to your Auto Scaling group, you can configure your Auto Scaling group to use Elastic Load Balancing metrics (such as the Application Load Balancer request count per target) to scale the number of instances in the group as demand fluctuates.
+
+##### Tips
+1. You can attach an Elastic Load Balancing load balancer to your Auto Scaling group at any time. This registers the group with the load balancer, which acts as a single point of contact for all incoming web traffic to your Auto Scaling group.
+2. Optionally, you can add Elastic Load Balancing health checks to your Auto Scaling group so that Amazon EC2 Auto Scaling can identify and replace unhealthy instances based on these additional health checks.
+
+For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)

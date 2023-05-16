@@ -17,6 +17,8 @@
     6. [SSL/TLS Certificates](aws-elb-ssl-certificates)
     7. [Connection draining](#aws-elb-connection-draining)
     8. [Auto scaling groups](#aws-elb-auto-scaling-groups)
+    9. [Scaling policies](#aws-elb-auto-scaling-groups-scaling-policies)
+    10. [Instance refresh](#aws-elb-auto-scaling-groups-instance-refresh)
 
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
@@ -540,3 +542,40 @@ For more information about Amazon ELB and Auto Scaling groups, you can refer to 
 3. You can use launch template or override it to specify instance attributes, manually add instance types and have a mix of on-demand and spot instances.
 
 ![](https://i.imgur.com/WxYBLbb.png)
+
+4. You can attach a load balancer to the Auto Scaling group.  
+
+![](https://i.imgur.com/S6HdsaQ.png)    
+
+5. You can then define the health checks. EC2 health check can trigger an Auto scaling group to remove an instance from the group if an EC2 instance is unhealthy. ELB health checks can trigger if the ELB deems the instance to be unhealthy.
+
+6. You can specify the group size.
+
+![](https://i.imgur.com/CTXJl8R.png)
+
+7. Auto Scaling group is created.
+
+![](https://i.imgur.com/CLEPv8x.png)
+
+8. In the Auto Scaling group's "Activity" tab, you can see the Auto Scaling group provisioning the instances. The actual instances can be found on the Auto Scaling groups's "Instance management" tab as well as the EC2 instances page.
+
+![](https://i.imgur.com/0TjAMlG.png)
+![](https://i.imgur.com/egf6jVW.png)
+![](https://i.imgur.com/k4qDpoS.png)
+
+9. If I terminate of the instances created by the Auto scaling group, another one is automatically provisioned to meet the 2 instance group size requirement.
+
+![](https://i.imgur.com/Fu8dwFQ.png)
+
+<a name=“aws-elb-auto-scaling-groups-scaling-policies”></a>
+
+#### Scaling Policies
+> With step scaling and simple scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that invoke the scaling process. You also define how your Auto Scaling group should be scaled when a threshold is in breach for a specified number of evaluation periods. When step adjustments are applied, and they increase or decrease the current capacity of your Auto Scaling group, the adjustments vary based on the size of the alarm breach. In most cases, step scaling policies are a better choice than simple scaling policies, even if you have only a single scaling adjustment.
+
+For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)
+
+<a name=“aws-elb-auto-scaling-groups-instance-refresh”></a>
+#### Instance Refresh
+> Instance refresh is a feature that helps you update all instances in an Auto Scaling group in a rolling fashion (i.e., one batch at a time) . You can use instance refresh to update instances to use a new launch template or launch configuration. During an instance refresh, Amazon EC2 Auto Scaling takes care of updating instances for you by terminating instances and replacing them with new instances.
+
+For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)

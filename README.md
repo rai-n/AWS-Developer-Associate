@@ -650,3 +650,20 @@ During an instance refresh, Amazon EC2 Auto Scaling takes care of updating insta
 You can also set up a warm-up time which is a prediction of how long until the instance is ready to use
 
 For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)
+
+<a name=“aws-rds”></a>
+### Amazon Relational Database Service (RDS)
+
+#### Overview
+Amazon Relational Database Service (Amazon RDS) is a web service that makes it easier to set up, operate, and scale a relational database in the AWS Cloud. It provides cost-efficient, resizable capacity for an industry-standard relational database and manages common database administration tasks1. You can choose from seven popular engines — Amazon Aurora with MySQL compatibility, Amazon Aurora with PostgreSQL compatibility, MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server — and deploy on-premises with Amazon RDS on AWS Outposts.
+
+##### Use Cases
+1. Build web and mobile applications: Support growing apps with high availability, throughput, and storage scalability. Take advantage of flexible pay-per-use pricing to suit various application usage patterns.
+2. Move to managed databases: Innovate and build new apps with Amazon RDS instead of worrying about self-managing your databases, which can be time consuming, complex, and expensive.
+3. Break free from legacy databases: Free yourself from expensive, punitive, commercial databases by migrating to Amazon Aurora. When you migrate to Aurora, you get the scalability, performance, and availability of commercial databases at 1/10th the cost.
+
+##### Tips
+1. You can use the AWS Database Migration Service (DMS) to easily migrate or replicate your existing databases to Amazon RDS.
+2. Amazon RDS Partners help you with database monitoring, security, and performance using Amazon RDS database engines.
+
+For more information about Amazon RDS you can refer to the [official documentation](https://aws.amazon.com/rds/)

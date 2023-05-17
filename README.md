@@ -568,14 +568,85 @@ For more information about Amazon ELB and Auto Scaling groups, you can refer to 
 ![](https://i.imgur.com/Fu8dwFQ.png)
 
 <a name=“aws-elb-auto-scaling-groups-scaling-policies”></a>
-
 #### Scaling Policies
-> With step scaling and simple scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that invoke the scaling process. You also define how your Auto Scaling group should be scaled when a threshold is in breach for a specified number of evaluation periods. When step adjustments are applied, and they increase or decrease the current capacity of your Auto Scaling group, the adjustments vary based on the size of the alarm breach. In most cases, step scaling policies are a better choice than simple scaling policies, even if you have only a single scaling adjustment.
+
+With step scaling and simple scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that invoke the scaling process. You also define how your Auto Scaling group should be scaled when a threshold is in breach for a specified number of evaluation periods. When step adjustments are applied, and they increase or decrease the current capacity of your Auto Scaling group, the adjustments vary based on the size of the alarm breach. In most cases, step scaling policies are a better choice than simple scaling policies, even if you have only a single scaling adjustment.
+
+##### Scaling cooldown
+After a scaling activity, there is a 5 minute minute cooldown where the ASG will not launch or terminate additional instances to allow metrics to stabilize.
+Therefore, use a ready-to-use AMI to reduce configuration time in order to be serving requests faster and reduce the cooldown period.
+
+The scaling policies include:
+
+![](https://i.imgur.com/3dMS5YJ.png)
+
+1. Target Tracking Scaling - "I want average CPU to stay around 40%" 
+
+![](https://i.imgur.com/7VhMdeR.png)
+
+2. Step scaling - When a CloudWatch alarm is triggered (CPUUtilization > 70%), then add 2 instances.
+
+![](https://i.imgur.com/psLaYtw.png)
+
+3. Scheduled actions - Scaling based on known pattern. E.g. increase minimum capacity to 8 at 5pm on Friday. 
+
+![](https://i.imgur.com/60qP7Sy.png)
+
+4. Predictive scaling - forecasting load and scheduling based on historical load
+
+![](https://i.imgur.com/hWatEOL.png)
+
+##### Good metrics to scale on:
+1. CPUUtilization - Average CPU utilization across your instances
+2. RequestCountPerTarget - To make sure the number of requests per EC2 instances is stable
+3. Average Network In/Out (if the application is network bounded)
+4. Other custom metric (that you can create using CloudWatch)
 
 For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)
 
+##### Target Tracking Scaling example
+
+1. Set the desired and minimum capacity to 1 and maximum capacity to 3 so that the Auto Scaling group can scale out.
+
+![](https://i.imgur.com/r3rCT20.png)
+
+2. Create a Target Tracking Policy with a target of CPU Utilization at 40%. This will create CloudWatch alarms and trigger scale out or scale in behavior.
+
+![](https://i.imgur.com/LV4f0n3.png)
+
+3. I installed Stress Util on Amazon Linux 2 using:
+```
+sudo amazon-linux-extras install epel -y
+sudo yum install stress -y
+stress -c 4
+```
+
+`stress -c 4` makes 4 vCPU being used at a time to increase CPU utilization.
+
+![](https://i.imgur.com/pBs0jeH.png)
+
+4. CPU Utilization exceeds 40%
+
+![](https://i.imgur.com/jRybxme.png)
+
+5. The activity section in Auto Scaling group showing the capacity scaling out from 1 to 3 to maintain CPU Utilization at 40%.
+
+![](https://i.imgur.com/1XsHs3s.png)
+
+6. A CloudWatch Alarm is also triggered where it shows the condition triggered. 
+
+![](https://i.imgur.com/3z2U8W5.png)
+
+
+6. Once the alarm is triggered, the new instances are automatically provisioned to meet the increase in CPU demand. Once the script is closed, the desired capacity scales in from 3 to 1 and the two extra instances are terminated.
+
+![](https://i.imgur.com/8AqyCQs.png)
+
 <a name=“aws-elb-auto-scaling-groups-instance-refresh”></a>
 #### Instance Refresh
-> Instance refresh is a feature that helps you update all instances in an Auto Scaling group in a rolling fashion (i.e., one batch at a time) . You can use instance refresh to update instances to use a new launch template or launch configuration. During an instance refresh, Amazon EC2 Auto Scaling takes care of updating instances for you by terminating instances and replacing them with new instances.
+
+Instance refresh is a feature that helps you update all instances in an Auto Scaling group in a rolling fashion (i.e., one batch at a time). You can use instance refresh to update instances to use a new launch template or launch configuration.
+During an instance refresh, Amazon EC2 Auto Scaling takes care of updating instances for you by terminating instances and replacing them with new instances through setting a minimum healthy percentage such as 70%. 
+You can also set up a warm-up time which is a prediction of how long until the instance is ready to use
 
 For more information about Amazon ELB and Auto Scaling groups, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html)

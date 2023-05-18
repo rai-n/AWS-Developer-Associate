@@ -737,5 +737,56 @@ You should consider using Multi-AZ DB cluster deployments with two readable DB i
 
 ![](https://i.imgur.com/ek8Qjs9.png)
 
+8. You can use a tool like Sql Electron client to connect and interface with the database.
+
+![](https://i.imgur.com/znbt581.png)
+![](https://i.imgur.com/bnaFKXo.png)
+
+9. From the RDS instance console, you can also directly create read replicas to increase read capacity, migrate to another region, take snapshots and restore in a different AZ or restore to a point in time. In the "Monitoring" tab you can also see DB analytics such as CPU Utilization.
+
+![](https://i.imgur.com/lR8qD3c.png)
+![](https://i.imgur.com/zif4i8Q.png)
 
 For more information about Amazon RDS Read Replicas you can refer to the [official documentation](https://aws.amazon.com/rds/features/read-replicas/)
+
+<a name=“aws-aurora”></a>
+### Amazon Aurora
+
+#### Overview
+Amazon Aurora is a fully managed relational database engine that’s compatible with MySQL and PostgreSQL. It combines the speed and reliability of high-end commercial databases with the simplicity and cost-effectiveness of open-source databases. With some workloads, Aurora can deliver up to five times the throughput of MySQL and up to three times the throughput of PostgreSQL without requiring changes to most of your existing applications. Aurora storage automatically grows in increments of 10GB, up to 128 TB and have up to 15 replicas and the replication process is faster than MySQL. Aurora costs 20% more than RDS but is more efficient. Failover in Aurora is instantaneous compared to multi-az or cluster for RDS. As well there is:
+- Industry compliance
+- Push-button scaling
+- Automated patching with 0 downtime
+- Backtrack (restore data at any point without using backups)
+    - Amazon Aurora Backtrack is a feature that allows you to “rewind” a database cluster to a specific point in time without restoring data from a backup. This feature works by using the distributed, log-structured storage system of Amazon Aurora. Each change to your database generates a new log record, identified by a Log Sequence Number (LSN). When you enable the backtrack feature, Aurora provisions a FIFO buffer in the cluster for storage of LSNs, allowing for quick access and recovery times measured in seconds
+- Regular backup 
+- Isolation and security.
+
+##### Use Cases
+1. Modernize enterprise applications: Operate enterprise applications, such as customer relationship management (CRM), enterprise resource planning (ERP), supply chain, and billing applications, with high availability and performance.
+2. Build SaaS applications: Support reliable, high-performance, and multi-tenant Software-as-a-Service (SaaS) applications with flexible instance and storage scaling.
+3. Deploy globally distributed applications: Develop internet-scale applications, such as mobile games, social media apps, and online services, that require multi-Region scalability and resilience.
+
+##### High Availability and Read Scaling
+1. 6 copies of your data is made across 3 AZ
+    - 4 copies out of 6 needed for writes
+    - 3 copies out of 6 needed for reads
+    - self healing with peer-to-peer replication if there is data corruption
+    - storage is striped across 100s of volumes
+2. There is only once Aurora instance that takes writes (master)
+3. If the master doesn't work, failover happens in < 30 seconds
+
+![](https://i.imgur.com/8Ot8FIL.png)
+
+##### Aurora DB Cluster
+- Master writes to shared storage volume (Auto expanding 10GB - 128TB)
+- Aurora provides "Writer Endpoint" which always points to the master, even if the instance failover. The client is always talking to the writer endpoint. 
+- You can set up auto scaling on the read replicas so the read requirements are fulfilled.
+- There is also a "Reader Endpoint" which automatically connects to all the read replicas and load balances connections; when the client connects they are redirected to one of the read replicas.
+
+##### Tips
+1. Easily migrate MySQL or PostgreSQL databases to and from Aurora using standard tools, or run legacy SQL Server applications with Babelfish for Aurora PostgreSQL with minimal code change.
+
+![](https://i.imgur.com/ZbjXnfm.png)
+
+For more information about Amazon Aurora, you can refer to the official [AWS documentation](https://aws.amazon.com/rds/aurora/).

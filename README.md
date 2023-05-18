@@ -705,4 +705,37 @@ Amazon Multi AZ helps with diaster recovery by synchronously replicating master 
 
 ![](https://i.imgur.com/ASrkfPo.png)
 
-For more information about Amazon RDS Read Replicas you can refer to the [official documentation](https://aws.amazon.com/rds/features/read-replicas/).
+##### Launching an RDS instance
+
+1. You can choose between "standard create" which lets you configure the database, and "easy create" which uses best practice configuration and lets you quickly deploy the database. There are many relational database engines that you can select.
+
+![](https://i.imgur.com/e9o1RAq.png)
+
+2. For production and dev environments, you might use Multi-AZ deployment to synchronously replicate master DB to a standby database for better availability and disaster recovery. A Multi-AZ DB cluster deployment in Amazon RDS provides a high availability deployment mode of Amazon RDS with two readable standby DB instances. A Multi-AZ DB cluster has a writer DB instance and two reader DB instances in three separate Availability Zones in the same AWS Region. Multi-AZ DB clusters provide high availability, increased capacity for read workloads, and lower write latency when compared to Multi-AZ DB instance deployments.
+
+You should consider using Multi-AZ DB cluster deployments with two readable DB instances if you need additional read capacity in your Amazon RDS Multi-AZ deployment and if your application workload has strict transaction latency requirements such as single-digit milliseconds transactions.
+ 
+![](https://i.imgur.com/bCotxb1.png)
+
+3. After entering the database identifier and password, you can select the type of class. I selected `db.t2.micro` for the instance class, general purpose storage `gp2` with a maximum storage auto scaling of 1000 GB to remain in free tier. I used 
+
+![](https://i.imgur.com/Y7DC30h.png)
+
+4. For connectivity settings, you can automatically connect the DB to an EC2 instance which configures the underlying networking. I used my default VPC and set public access to true so that I can access the DB from my pc using the internet.
+
+![](https://i.imgur.com/gFckQY0.png)
+
+5. Users can authenticate to the database using password, IAM credentials or kerberos authentication. 
+
+![](https://i.imgur.com/G5buj4L.png)
+
+6. Giving an initial DB name creates the database when the instance is launched. The backup options can be used to specify if you want a backup and you can also define the retention period from 0-35 days. You can also select a window where you want the backups to be done. You can also 
+
+![](https://i.imgur.com/xZxuH7h.png)
+
+7. You can also select the type of logs you want to publish to CloudWatch logs, such as audit log, error, general and slow query log for long term retention. You can also choose to enable maintenance window and specify a time for automatic minor DB updates. Selecting "deletion protection" prevents the database from being deleted.
+
+![](https://i.imgur.com/ek8Qjs9.png)
+
+
+For more information about Amazon RDS Read Replicas you can refer to the [official documentation](https://aws.amazon.com/rds/features/read-replicas/)

@@ -655,15 +655,54 @@ For more information about Amazon ELB and Auto Scaling groups, you can refer to 
 ### Amazon Relational Database Service (RDS)
 
 #### Overview
-Amazon Relational Database Service (Amazon RDS) is a web service that makes it easier to set up, operate, and scale a relational database in the AWS Cloud. It provides cost-efficient, resizable capacity for an industry-standard relational database and manages common database administration tasks1. You can choose from seven popular engines — Amazon Aurora with MySQL compatibility, Amazon Aurora with PostgreSQL compatibility, MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server — and deploy on-premises with Amazon RDS on AWS Outposts.
+Amazon Relational Database Service (Amazon RDS) is a web service that makes it easier to set up, operate, and scale a relational database in the AWS Cloud. It provides cost-efficient, resizable capacity for an industry-standard relational database and manages common database administration tasks. You can choose from seven popular engines — Amazon Aurora with MySQL compatibility, Amazon Aurora with PostgreSQL compatibility, MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server — and deploy on-premises with Amazon RDS on AWS Outposts.
 
 ##### Use Cases
 1. Build web and mobile applications: Support growing apps with high availability, throughput, and storage scalability. Take advantage of flexible pay-per-use pricing to suit various application usage patterns.
-2. Move to managed databases: Innovate and build new apps with Amazon RDS instead of worrying about self-managing your databases, which can be time consuming, complex, and expensive.
+2. Move to managed databases: Innovate and build new apps with Amazon RDS instead of worrying about self-managing your databases, which can be time consuming, complex, and expensive such as: 
+    - Provisioning, OS patching
+    - Backups, restoring to a timestamp (Point in Time Restore)
+    - Monitoring dashboards
+    - Read replicas for better read performance
+    - Multi AZ setup for disaster recovery
+    - Maintenance windows for upgrades
+    - Scaling capability (horizontal and vertical)
+    - Storage backed by EBS (gp2 or io1)
 3. Break free from legacy databases: Free yourself from expensive, punitive, commercial databases by migrating to Amazon Aurora. When you migrate to Aurora, you get the scalability, performance, and availability of commercial databases at 1/10th the cost.
-
+4. RDS Storage Auto Scaling .
+    - Increase storage on RDS DB instance dynamically
+    - When RDS detects you are running out of space, it scales automatically up to a maximum storage threshold and if:
+        1. Free storage is less than 10% of allocated storage
+        2. Low storage lasts at least 5 minutes
+        3. 6 hours have passed since last modification 
+    - Useful for applications with unpredictable workloads
 ##### Tips
 1. You can use the AWS Database Migration Service (DMS) to easily migrate or replicate your existing databases to Amazon RDS.
 2. Amazon RDS Partners help you with database monitoring, security, and performance using Amazon RDS database engines.
 
 For more information about Amazon RDS you can refer to the [official documentation](https://aws.amazon.com/rds/)
+
+<a name=“aws-rds-read-replicas”></a>
+### Amazon RDS Read Replicas
+
+#### Overview
+Amazon RDS Read Replicas provide enhanced performance and durability for Amazon RDS database (DB) instances. They make it easy to elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads. You can create one or more replicas of a given source DB Instance and serve high-volume application read traffic from multiple copies of your data, thereby increasing aggregate read throughput. Read replicas can also be promoted when needed to become standalone DB instances. For RDS Read Replicas, you are not charged for networking cost of asynchronous replication to another AZ in the same region, but cross region replication is charged.
+
+![](https://i.imgur.com/PKVwixD.png)
+
+##### Use Cases
+1. Scaling beyond the compute or I/O capacity of a single DB instance for read-heavy database workloads. You can direct this excess read traffic to one or more read replicas.
+2. Serving read traffic while the source DB instance is unavailable. In some cases, your source DB instance might not be able to take I/O requests, for example due to I/O suspension for backups or scheduled maintenance. In these cases, you can direct read traffic to your read replicas.
+3. Business reporting or data warehousing scenarios where you might want business reporting queries to run against a read replica, rather than your production DB instance.
+4. Implementing disaster recovery. You can promote a read replica to a standalone instance as a disaster recovery solution if the primary DB instance fails.
+
+##### Tips
+1. For the MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server database engines, Amazon RDS creates a second DB instance using a snapshot of the source DB instance. It then uses the engines’ native asynchronous replication to update the read replica whenever there is a change to the source DB instance.
+2. The read replica operates as a DB instance that allows only read-only connections; applications can connect to a read replica just as they would to any DB instance.
+
+##### Multi AZ Disaster recovery
+Amazon Multi AZ helps with diaster recovery by synchronously replicating master DB instance to a standby instance in another AZ. There is only one DNS name and the application automatically failover to standby instance if there are any issues with the master DB such as loss of AZ, network, instance or storage failure. This increases availability. 
+
+![](https://i.imgur.com/ASrkfPo.png)
+
+For more information about Amazon RDS Read Replicas you can refer to the [official documentation](https://aws.amazon.com/rds/features/read-replicas/).

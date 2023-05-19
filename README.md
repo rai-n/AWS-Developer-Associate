@@ -784,9 +784,67 @@ Amazon Aurora is a fully managed relational database engine that’s compatible 
 - You can set up auto scaling on the read replicas so the read requirements are fulfilled.
 - There is also a "Reader Endpoint" which automatically connects to all the read replicas and load balances connections; when the client connects they are redirected to one of the read replicas.
 
+![](https://i.imgur.com/x5MEcll.png)
+![](https://i.imgur.com/Pr2rJTE.png)
+
 ##### Tips
 1. Easily migrate MySQL or PostgreSQL databases to and from Aurora using standard tools, or run legacy SQL Server applications with Babelfish for Aurora PostgreSQL with minimal code change.
 
 ![](https://i.imgur.com/ZbjXnfm.png)
 
-For more information about Amazon Aurora, you can refer to the official [AWS documentation](https://aws.amazon.com/rds/aurora/).
+##### Security for RDS & Aurora 
+1. Data encrypted in volumes at rest 
+    - Database master & replica encryption using AWS KMS - must be defined as launch time
+    - If the master is not encrypted, the read replicas cannot be encrypted
+    - To encrypt an un-encrypted database, go through a DB snapshot & restore as encrypted
+2. In-light encryption
+    - TLS-ready by default, use the AWS TLS root certificates client-side
+3. IAM Authentication
+    - IAM roles to connect to your database (instead of username/ password)
+4. Security Groups
+    - Control Network access to your RDS/ Aurora DB
+5. Audit Logs can be enabled and sent to CLoudWatch Logs for longer retention
+
+For more information about Amazon Aurora, you can refer to the official [AWS documentation](https://aws.amazon.com/rds/aurora/)
+
+<a name=“aws-rds-proxy”></a>
+### Amazon RDS Proxy
+
+#### Overview
+Amazon RDS Proxy is a fully managed, highly available database proxy for Amazon Relational Database Service (RDS) that makes applications more scalable, more resilient to database failures, and more secure. RDS Proxy allows applications to pool and share connections established with the database, improving database efficiency by reducing the stress on database resources like CPU, CRAM and minimize open connections and timeouts. RDS Proxy is never publicly accessible and must be accessed from VPC.
+
+##### Use Cases
+RDS Proxy is particularly helpful for applications that have unpredictable workloads, frequently open and close database connections, or require higher availability during transient database failures.
+
+##### Tips
+1. RDS Proxy can be enabled for most applications with no code changes.
+2. RDS Proxy can enforce AWS Identity and Access Management (IAM) authentication for databases and securely store credentials in AWS Secrets Manager.
+3. RDS Proxy can reduce failover times for Aurora and RDS databases by up to 66%.
+
+##### RDS Proxy vs Multi-AZ 
+
+Amazon RDS Proxy and Multi-AZ deployments are two different features that can be used together to improve the scalability, availability, and resilience of your database.
+
+Multi-AZ deployments provide high availability by automatically failing over to a standby replica in a different Availability Zone in the event of a primary DB instance failure or planned maintenance. This can help minimize downtime and data loss. On the other hand, RDS Proxy is a fully managed database proxy that sits between your application and your RDS database. It allows applications to pool and share connections to the database, reducing the overhead of establishing new connections and improving database efficiency and application scalability. RDS Proxy can also reduce failover times for Aurora and RDS databases by up to 66%1.
+
+Using reader/writer endpoints with Aurora allows you to distribute read traffic across multiple read replicas, improving read scalability. However, this approach requires you to manage connections to multiple endpoints in your application code.
+
+In summary, RDS Proxy can provide additional benefits over Multi-AZ deployments and using reader/writer endpoints with Aurora by improving connection management, reducing failover times, and making applications more resilient to database failures.
+
+For more information about Amazon RDS Proxy, you can refer to the official [AWS documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html)
+
+<a name=“aws-elasticache”></a>
+### Amazon ElastiCache
+
+#### Overview
+Amazon ElastiCache is a fully managed in-memory data store and cache service that supports two open-source in-memory engines: Redis and Memcached. ElastiCache can be used to improve the performance of web applications by allowing you to retrieve information from fast, managed, in-memory data stores instead of relying on slower disk-based databases.
+
+##### ElastiCache Strategies
+ElastiCache allows you to implement various caching strategies to improve the performance of your application. Two common strategies are Lazy Loading and Write-Through.
+
+1. Lazy Loading, also known as “cache aside,” is a caching strategy that loads data into the cache only when necessary. When your application requests data, it first makes the request to the cache. If the data exists in the cache and is current, the cache returns the data to your application. If the data doesn’t exist in the cache or has expired, your application requests the data from your data store. Your data store then returns the data to your application. Your application next writes the data received from the store to the cache.
+
+2. Write-Through is a caching strategy where data is written to both the cache and the underlying data store at the same time. This ensures that the cache always has the most up-to-date version of the data. However, this approach can increase write latency since writes must be performed on both the cache and the underlying data store.
+
+##### Amazon MemoryDB for Redis
+Amazon MemoryDB for Redis is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance with high availability and durability. MemoryDB for Redis is built for applications that require microsecond read and write latencies with strong durability guarantees.

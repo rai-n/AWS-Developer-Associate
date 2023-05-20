@@ -19,7 +19,12 @@
     8. [Auto scaling groups](#aws-elb-auto-scaling-groups)
     9. [Scaling policies](#aws-elb-auto-scaling-groups-scaling-policies)
     10. [Instance refresh](#aws-elb-auto-scaling-groups-instance-refresh)
-
+- [Relational Database Service](aws-rds)
+    1. [Read Replicas](#aws-rds-read-replicas)
+    2. [Proxy](#aws-rds-proxy)
+- [Aurora](#aws-aurora)
+- [ElastiCache](#aws-elasticache)
+- [MemoryDB for Redis](#aws-memorydb-for-redis)
 <a name="aws-iam"></a>
 ### AWS Identity and Access Management (IAM)
 
@@ -839,12 +844,125 @@ For more information about Amazon RDS Proxy, you can refer to the official [AWS 
 #### Overview
 Amazon ElastiCache is a fully managed in-memory data store and cache service that supports two open-source in-memory engines: Redis and Memcached. ElastiCache can be used to improve the performance of web applications by allowing you to retrieve information from fast, managed, in-memory data stores instead of relying on slower disk-based databases.
 
+
 ##### ElastiCache Strategies
 ElastiCache allows you to implement various caching strategies to improve the performance of your application. Two common strategies are Lazy Loading and Write-Through.
 
-1. Lazy Loading, also known as “cache aside,” is a caching strategy that loads data into the cache only when necessary. When your application requests data, it first makes the request to the cache. If the data exists in the cache and is current, the cache returns the data to your application. If the data doesn’t exist in the cache or has expired, your application requests the data from your data store. Your data store then returns the data to your application. Your application next writes the data received from the store to the cache.
+1. Lazy Loading, also known as “cache aside,” is a caching strategy that loads data into the cache only when necessary. When your application requests data, it first makes the request to the cache. If the data exists in the cache and is current, the cache returns the data to your application. If the data doesn’t exist in the cache or has expired, your application requests the data from your data store. Your data store then returns the data to your application. Your application next writes the data received from the store to the cache. See pseudocode below:
+
+![](https://i.imgur.com/MgykC7V.png)
+![](https://i.imgur.com/gUXT6Cv.png)
 
 2. Write-Through is a caching strategy where data is written to both the cache and the underlying data store at the same time. This ensures that the cache always has the most up-to-date version of the data. However, this approach can increase write latency since writes must be performed on both the cache and the underlying data store.
 
+![](https://i.imgur.com/bz5Idez.png)
+![](https://i.imgur.com/bYJmk7s.png)
+
+##### Cache Eviction and Time-to-live (TTL)
+Cache eviction refers to the process of removing data from a cache when it is no longer needed or when the cache is full and needs to make room for new data. Time-to-live (TTL) is a common cache eviction strategy that automatically removes data from the cache after a specified period of time has passed. This can help ensure that the data in the cache is up-to-date and relevant.
+
+For example, Hazelcast has a time-to-live-seconds attribute that can be set for entries in a map. Entries that are older than the specified number of seconds and have not been updated within that time will be automatically evicted from the map. Similarly, Spring Boot allows you to set a default TTL for cache entries using the spring.cache.redis.time-to-live property.
+
+- TTL are helpful for any kind of data:
+    1. Leaderboards
+    2. Comments
+    3. Activity streams
+- TTL can range from few seconds to hours or days
+- If there are too many evictions happening due to memory, you should scale up or out
+
+##### Solutions Architecture 
+1. DB Cache
+    - Applications query ElastiCache and if there is a miss, the data is fetched from RDS and sent to application and written to ElastiCache
+    - Relieves load in RDS
+    - Cache must have invalidation strategy to ensure only most current data is used there
+
+![](https://i.imgur.com/ztnSXIq.png)
+
+2. User Session Store
+    - User logs into any of the application
+    - The application writes the session data into ElastiCache
+    - The user hits another instance of our application
+    - The instance retrieves the data if the user is already logged in
+    - This makes the application stateless
+        1. Making an application stateless means that the application does not store any data about client state or session information. Instead, this information is offloaded to a cache or a database so that the application itself does not need to keep track of it. This allows the application to scale horizontally and be tolerant to the failure of an individual node.
+
+        2. Amazon ElastiCache is a service that can be used to offload state from an application. It provides an in-memory cache that can be used to store frequently accessed data, such as session information, at low latency. By using ElastiCache, you can improve the performance of your application and make it stateless.
+
+![](https://i.imgur.com/nXuLy6G.png)
+
 ##### Amazon MemoryDB for Redis
 Amazon MemoryDB for Redis is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance with high availability and durability. MemoryDB for Redis is built for applications that require microsecond read and write latencies with strong durability guarantees.
+
+##### Use Cases
+1. ElastiCache can be used for a variety of use cases such as lowering total cost of ownership by caching your data and offloading database I/O to reduce operational burden, lower costs, and improve performance of both the database and the application. It can also be used for real-time application data caching by storing frequently used data 2. in-memory for microsecond response times and high throughput to support hundreds of millions of operations per second.
+
+##### Tips
+1. ElastiCache integrates with other AWS services such as Amazon CloudWatch for enhanced visibility into key performance statistics associated with your cache.
+2. You can use ElastiCache’s built-in data structures to simplify application development.
+3. ElastiCache makes setup, scaling, and cluster failure handling much simpler than in a self-managed cache deployment.
+
+##### Redis vs Memcached 
+
+- Similar to RDS, REDIS has Multi AZ deployments with auto failover. It uses Read Replicas to scale reads and have high availability. It has high data durability using AOF persistence. It has backup and restore features as well as support for sets and sorted sets.
+    1. Redis can use an Append Only File (AOF) for high data durability. AOF is a logging mechanism that writes every write operation performed on the Redis database to a log file on disk. This log file can be used to reconstruct the database in the event of a crash or failure. When Redis is restarted, it reads the log file and re-executes the write operations in the file to restore the database to its previous state.
+    2. AOF provides better data durability than the snapshot persistence option, which only creates point-in-time snapshots of data. However, it is slower and requires more disk space, as it must write every write operation to the log file. The AOF file can be configured to be rewritten in the background when it gets too large, using a process called AOF fsync.
+- Memcached in the other hand uses multi-node partitioning of data (sharding). It does not have high availability as there is no replications happening. There is no data persistence, and the ability to backup and restore. It has a multi-threaded architecture.
+
+![](https://i.imgur.com/H5jyopA.png)
+
+##### Creating an ElastiCache Redis cluster
+
+- I disabled cluster mode to stay in the free tier and not use replication across multiple shards.
+
+![](https://i.imgur.com/CKPYfp5.png)
+
+- Using On Cloud location but you can create the Redis instance on premise by specifying an outpost id.
+
+![](https://i.imgur.com/DgttbMW.png)
+
+- I used `cache.t2.micro` and set the number of replicas to zero to remain in free tier.
+
+![](https://i.imgur.com/dVtOdDQ.png)
+
+- Then just like RDS, the network and subnets are defined. 
+
+![](https://i.imgur.com/0MriXZf.png)
+
+- Then for security, you can enable encryption at rest using AWS KMS as well as encryption in transit where you can use access control such as Redis Auth. 
+
+![](https://i.imgur.com/vpUnvIC.png)
+
+- Just like RDS, you can also set up backup and retention periods. 
+
+![](https://i.imgur.com/lIXI6xP.png)
+
+- Just like RDS, you can define the maintenance window for updates, as well as auto upgrade for minor versions.
+
+![](https://i.imgur.com/9ULBfo7.png)
+
+- Just like RDS, you can also enable logs for logging queries based on some criteria.
+
+![](https://i.imgur.com/n0PXf9U.png)
+
+##### Summary
+1. Lazy loading / Cache aside is easy to implement and works for many situations as a foundation, especially on read side. 
+2. Write-through is usually combined with lazy loading as targeted for queries or workloads that benefit from this optimization to improve cache staleness.
+3. Setting a TTL is usually not a bad idea, except when you're using Write-through. Set it to a sensible value for the application.
+4. Only cache things that make sense (user profile, blogs, etc)
+
+For more information about Amazon ElastiCache, you can refer to the official [AWS documentation](https://aws.amazon.com/elasticache/)
+
+<a name=“aws-memorydb-for-redis”></a>
+### MemoryDB for Redis Overview
+
+##### Overview
+Amazon MemoryDB for Redis is a durable, in-memory database service that delivers ultra-fast performance. It is purpose-built for modern applications with microservices architectures and is compatible with Redis, a popular open source data store. With MemoryDB, all of your data is stored in memory, which enables you to achieve microsecond read and single-digit millisecond write latency and high throughput.
+
+![](https://i.imgur.com/7N50AaX.png)
+
+##### Tips
+1. MemoryDB for Redis can be used as a high-performance primary database for your microservices applications, eliminating the need to separately manage both a cache and durable database.
+2. You can build applications quickly with Redis, Stack Overflow’s “Most Loved” database for five consecutive years.
+3. MemoryDB also stores data durably across multiple Availability Zones (AZs) using a Multi-AZ transactional log to enable fast failover, database recovery, and node restarts.
+ 
+For more information about Amazon Aurora, you can refer to the official [AWS documentation](https://aws.amazon.com/memorydb/)

@@ -966,3 +966,101 @@ Amazon MemoryDB for Redis is a durable, in-memory database service that delivers
 3. MemoryDB also stores data durably across multiple Availability Zones (AZs) using a Multi-AZ transactional log to enable fast failover, database recovery, and node restarts.
  
 For more information about Amazon Aurora, you can refer to the official [AWS documentation](https://aws.amazon.com/memorydb/)
+
+<a name=“aws-route-53></a>
+### Route 53
+
+##### Overview
+Amazon Route 53 is a highly available, scalable, fully managed and "Authoritative" DNS web service. It is designed to give developers and businesses an extremely reliable and cost-effective way to route end users to Internet applications by translating URL like `www.google.com` into the numeric IP addresses like `172.217.18.36` that computers use to connect to each other. 
+    - Authoritative means that the customer (you) can update the DNS records.
+Route 53 is also a domain registrar which lets register domains and also gives the ability to check the health of your resources. This is the only AWS service which provides 100% availability SLA.
+
+##### DNS Terminology
+- Name Server: resolves DNS queries
+- Top Level Domain (TLD): .com, .us, .gov, .org, ...
+- Second Level Domain (SLD): amazon.com, google.com
+- Sub Domain: www.google.com 
+- Fully Qualified Domain Name (FQDN): api.www.example.com
+- Protocol: http://, https://
+
+![](https://i.imgur.com/IXTdZds.png)
+
+##### How DNS Works
+- Web browser accesses `example.com`.
+- Local DNS server asks Root DNS server (managed by ICANN - est sep 1998), resolves the top level domain to be `.com` and returns a response to ask local DNS server to check `.com` NS in IP 1.2.3.4. 
+- The Local DNS server asks the `.com` TLD DNS server (managed by IANA - est dec 1988), resolves the `example.com`. It does know `example.com` but does not know which record it is in, and returns a response to ask local DNS sever to check `example.com` NS in 5.6.7.8.
+- The local DNS server then goes to the SLD DNS server (managed by Domain Registrar), resolves the `example.com`. It knows that it is a record and returns the IP for the record `example.com` IP 9.10.11.12. 
+- The Local DNS server TTL caches the IP address for next time if someone is trying access `example.com`.
+- The web browser can now access the web server.
+ 
+![](https://i.imgur.com/9WfapHM.png)
+
+##### Use cases
+Some use cases for Amazon Route 53 include managing network traffic globally, building highly available applications, setting up private DNS, and registering domain names. You can also use Amazon Route 53 to map your zone apex (example.com versus www.example.com) to your Elastic Load Balancing instance, Amazon CloudFront distribution, AWS Elastic Beanstalk environment, API Gateway, VPC endpoint, or Amazon S3 website bucket using a feature called Alias record.
+
+##### Records
+- Records determine how you want to route traffic to a specific domain.
+- Each record contains:
+    1. Domain/subdomain name: e.g. `example.com`
+    2. Record Type: e.g. A or AAAA 
+    3. Value: e.g. 12.34.56.78
+    4. Routing Policy: how Route 53 responds to queries
+    5. TTL: amount of time record cached at DNS resolvers
+- Route 53 supports the following DNS record types:
+    1. (must know) A/ AAAA/ CNAME/ NS
+    2. (advanced, not need to know for exam) CAA/ DS/ MX/ NAPTR/ PTR/ SOA/ TXT/ SPF/ SRV
+
+##### Record Types
+- A: maps a hostname to IPv4
+- AAAA: maps a hostname to IPv6
+- CNAME: maps a hostname to another hostname
+    - The target must be an A or AAAA record
+    - Can't create a CNAME record for the top node of a DNS namespace (Zone Apex)
+    - E.g. you can't create for `example.com` but you can for `www.example.com`
+- NS: Name servers for the hosted zone
+    - They are the DNS/ IP Addresses of the servers that can respond to DNS queries for hosted zone
+    - Control how traffic is routed for a domain
+
+##### Hosted Zones
+A hosted zone is a container for records in Amazon Route 53. Records contain information about how you want to route traffic for a specific domain and its subdomains. A hosted zone and the corresponding domain have the same name. 
+
+There are two types of hosted zones: public hosted zones and private hosted zones.
+1. Public hosted zones contain records that specify how you want to route traffic on the internet.
+
+![](https://i.imgur.com/HXu0J8C.png)
+
+2. Private hosted zones contain records that specify how you want to route traffic in one ore more Amazon VPC.
+
+![](https://i.imgur.com/q9ulRq5.png)
+
+There is a charge of $0.50 per month per hosted zone.
+
+##### Registering a domain
+
+1. Choosing an available domain name. You then enter contact details, select if you want to automatically renew the domain as well as enabling privacy protection for hiding contact details for .com domains.
+
+![](https://i.imgur.com/WCsQZx1.png)
+
+2. Once it is registered, you can see the details below.
+
+![](https://i.imgur.com/WY1Jb90.png)
+
+3. A hosted zone should also have been created for you by Route 53. On the hosted zone's records tab you should see the new records. For the domain name, the servers on the right are the authoritative servers that give you the values of the records in a table. 
+
+![](https://i.imgur.com/PPzOIRL.png)
+![](https://i.imgur.com/PmWhoYl.png)
+
+4. Creating A type record for `test.domain.com`to redirect to an IPv4 address of value 11.22.33.44.
+
+![](https://i.imgur.com/0h9CAvz.png)
+
+5. You can use `nslookup test.domainname.com` to get the address answer for corresponding domain name. Or you can also use the `dig test.domainname.com` command to get the TTL, resolved IP addresses, as well as the record type.
+
+![](https://i.imgur.com/LVpHXaN.png)
+![](https://i.imgur.com/6fCr9dh.png)
+
+##### Records TTL (Time To Live)
+
+For more information about Amazon Route 53 and its use cases, you can refer to the official [AWS documentation](https://aws.amazon.com/route53/).
+
+

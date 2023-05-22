@@ -1061,6 +1061,54 @@ There is a charge of $0.50 per month per hosted zone.
 
 ##### Records TTL (Time To Live)
 
+When a client sends a DNS request such as `myapp.example.com` to Route 53, a response of A record with an IP address of 12.34.56.78 might be sent back, alongside a TTL. This TTL value represents the amount of time the client should cache the result IP address. For example, the client could cache it for 300 seconds. Subsequently, any DNS request with the cached result will return the cached result if it is within the 300 seconds and will not issue a request to the DNS. We don't except the records to change a lot hence why this is a good approach.
+- High TTL such as 24 hr will result in less traffic on Route 53 as the result IP address is cached for longer, but could result in stale records.
+- Low TTL such as 60 sec will result in more traffic on Route 53, which is more costly. The records are outdated for less time and it is easier to change records.
+- You could decrease the TTL for everyone if there are changes to records that you will be making, and after you could change the TTL back to high. 
+- Except for Alias records, TTL is mandatory for each DNS record.
+
+![](https://i.imgur.com/qzXqyzg.png)
+
+In the answer section of the `dig demo.domainname.com` query, you can see 98 seconds which represents the TTL for that particular cached result along the IP address. If any changes to the records are made, such as a new target IP address for the domain the new IP address response will be reflected once the TTL is over.
+
+![](https://i.imgur.com/qzf3mXh.png)
+
+##### CNAME vs Alias
+AWS resources such as load balancers, CloudFront... expose an AWS hostname such as `lbl-1234.us-east-2.elb.amazonaws.com` as `myappdomain.com`. 
+- CNAME:
+    - You can point a hostname to any other hostname (Canonical name). (app.mydomain.com => test.anotherdomain.com). This **only** works for non root domain e.g. `something.mydomain.com`.
+
+![](https://i.imgur.com/AgfvPWb.png)
+
+- Alias:
+    - Points a hostname to an AWS Resource (app.mydomain.com => test.amazonaws.com). This works for **both** root domain and non root domain. `mydomain.com` and `something.mydomain.com`. Alias is free or charge and has native health check.
+
+![](https://i.imgur.com/DEal9rD.png)
+
+    - You can also create an A type Alias record type which routes to an application load balancer at the zone apex. E.g. `mydomain.com`. 
+
+![](https://i.imgur.com/AyGwOYd.png)
+
+##### Alias Records 
+Alias records map a hostname to an AWS resource. This is an extension to DNS functionality, as if the underlying Application Load Balancer changes IP, the Alias record will recognize it. Unlike CNAME, it can be used for top node of a DNS namespace (Zone Apex). For example `example.com`. Alias Record is always of type A/AAAA for AWS resources like IPv4 and IPv6. The TTL is set automatically by Route 53. 
+
+![](https://i.imgur.com/3oZL3zi.png)
+
+##### Alias targets
+1. Elastic Load Balancers
+2. CloudFront Distributions
+3. API Gateway
+4. Elastic Beanstalk environments
+5. S3 Websites
+6. VPC Interface Endpoints
+7. Route 53 record in the same hosted zone
+You cannot set an Alias record for an EC2 DNS name
+
+##### Routing Policy
+@TODO
+
 For more information about Amazon Route 53 and its use cases, you can refer to the official [AWS documentation](https://aws.amazon.com/route53/).
+
+
 
 

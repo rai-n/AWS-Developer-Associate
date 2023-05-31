@@ -377,3 +377,13 @@ An example use case for S3 event notifications is when you want to automatically
 6. In the CloudWatch logs, the Lambda function invocation made by S3 can be seen containing `eventSource` as `aws:s3`, bucket name `{'name': 's3-event-event'}`, arn, object key, size, and more. This metadata is enough for the Lambda function to do S3.GetObject API call and get the object that was uploaded.
 
 ![](https://i.imgur.com/rEy6sOg.png)
+
+### Event Source Mapping 
+Lambda event source mapping allows you to automatically trigger a Lambda function in response to events from supported AWS services. You can set up an event source mapping between a service, such as Amazon Kinesis or Amazon SQS, and a Lambda function. When new records or messages are available in the service, they are automatically sent to the Lambda function for processing.
+
+#### Use Case
+An example use case for Lambda event source mapping is when you want to process data from a Kinesis data stream. You can set up an event source mapping between the Kinesis stream and a Lambda function. Whenever new records are added to the stream, they are automatically sent to the Lambda function for processing.
+
+#### Tips
+1. You can configure the batch size and starting position for your event source mapping. This allows you to control how many records or messages are sent to the Lambda function at once, and where in the stream or queue the processing should start.
+2. You can also set up error handling for your event source mapping. This allows you to specify a destination, such as an Amazon SNS topic or an Amazon SQS queue, where failed events are sent for further processing.

@@ -1104,10 +1104,41 @@ Alias records map a hostname to an AWS resource. This is an extension to DNS fun
 7. Route 53 record in the same hosted zone
 You cannot set an Alias record for an EC2 DNS name
 
-##### Routing Policy
-@TODO
+#### Routing Policy
+Amazon Route 53 routing policies determine how Route 53 responds to DNS queries. When you create a record, you choose a routing policy based on your needs. Here are some of the routing policies available:
+
+1. Simple routing policy: Use for a single resource that performs a given function for your domain, for example, a web server that serves content for a website.
+
+![](https://i.imgur.com/c9xPAPx.png)
+
+
+2. Failover routing policy: Use when you want to configure active-passive failover.
+3. Geolocation routing policy: Use when you want to route traffic based on the location of your users.
+4. Geoproximity routing policy: Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
+5. Latency routing policy: Use when you have resources in multiple AWS Regions and you want to route traffic to the region that provides the best latency.
+    * ![](https://i.imgur.com/jV52ctW.png)
+6. IP-based routing policy: Use when you want to route traffic based on the location of your users, and have the IP addresses that the traffic originates from.
+7. Multivalue routing policy: Use when you want Route 53 to respond to DNS queries with up to eight healthy records selected at random by the client. 
+8. Weighted routing policy: Use to route traffic to multiple resources in proportions that you specify.
+    * You can control the % of requests that go to each resource
+    * Assign each record a relative weight:
+        - Traffic % = weight for a specific record / sum of all weights for all records
+        - Weights don't need to sum to 100 
+    * DNS records must have the same name and type 
+    * Can be associated with Health Checks
+    * Use cases include:
+        1. Load balancing between regions
+        2. Sending some traffic with new application versions for testing
+        3. Sending traffic to a backup if the primary is unavailable
+    * Assigning a weight of 0 to a record stops sending traffic to a resource
+    * If all records have a weight of 0, then all records will be returned equally 
+
+When Alias is enabled, specify only one AWS resource. 
+
+Some common use cases for these routing policies include optimizing network transit costs or performance, localizing content, and presenting some or all of the website in the user’s language. For more information about Amazon Route 53 and its use cases, you can refer to the official AWS documentation.
 
 For more information about Amazon Route 53 and its use cases, you can refer to the official [AWS documentation](https://aws.amazon.com/route53/).
+
 
 
 

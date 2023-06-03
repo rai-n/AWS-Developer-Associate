@@ -48,6 +48,17 @@ You can learn more about Amazon S3 by visiting the official [AWS documentation](
 
 #### S3 Security and Bucket Policies
 Securing your Amazon S3 (S3) buckets is crucial to protect your data and prevent unauthorized access. S3 provides various security features and mechanisms to help you control access and enforce security policies. One of the key components for securing S3 is the use of bucket policies. Bucket policies allow you to define fine-grained access controls at the bucket level, ensuring that only authorized entities can interact with your S3 resources.
+You can have:
+* User based 
+    - IAM Policies - which API calls should be allowed for a specific user from IAM
+* Resource based
+    - Bucket Policies - bucket wide rules from the S3 console - allows cross account
+    - Object Access Control List ACL - finer grain (can be disabled)
+    - Bucket Access Control List ACL - less common (can be disabled)
+* An IAM principle can access an S3 object if 
+    - The user IAM permissions ALLOW it *OR* the resource policy allows it
+    - *AND* there is no explicit DENY in the action 
+* Objects can also be encrypted using encryption keys
 
 ##### Use Cases:
 1. Access Control: Bucket policies enable you to control access to your S3 buckets based on a wide range of conditions. You can grant or deny permissions to specific AWS accounts, IAM users, IAM roles, or even to anonymous users. This level of granularity allows you to tailor access controls to meet the specific security requirements of your applications.
@@ -61,3 +72,30 @@ Securing your Amazon S3 (S3) buckets is crucial to protect your data and prevent
 4. Regularly Test and Validate Policies: Test your bucket policies by simulating different scenarios and access patterns to ensure they function as intended. AWS provides tools like IAM Policy Simulator and Access Analyzer to help you validate and troubleshoot your policies.
 
 You can learn more about securing S3 and configuring bucket policies by visiting the official [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-iam-policies.html)
+
+### S3 JSON-Based Policies
+Amazon S3 (S3) allows you to define access controls and permissions using JSON-based policies. These policies provide a flexible and powerful way to manage access to your S3 resources at a granular level. By using JSON syntax, you can specify conditions, actions, and resources to define fine-grained access control rules for your buckets and objects stored in S3.
+
+![](https://i.imgur.com/UuqbiJx.png)
+
+#### How JSON Policies Work with S3:
+1. JSON policies for S3 consist of a set of statements that define who has access to which resources and what actions they can perform. Each statement includes an "Effect" (allow or deny), a "Principal" (the entity that can access the resource), an "Action" (the specific actions that are allowed or denied), and a "Resource" (the S3 bucket or object that the policy applies to).
+2. The "Effect" field determines whether the statement allows or denies the specified access. You can use multiple statements in a policy to define complex access control scenarios. For example, you can allow read access to a specific bucket for a particular IAM user, while denying write access to all other users.
+3. The "Principal" field identifies the entity that the policy applies to. It can be an AWS account ID, an IAM user, an IAM role, or even anonymous users.
+4. The "Action" field specifies the set of actions that are allowed or denied. These actions can include operations like `GetObject`, `PutObject`, `DeleteObject`, and more. You can specify wildcard characters (*) to allow or deny a range of actions.
+5. The "Resource" field defines the S3 resources to which the policy applies. It can specify individual buckets, objects, or use wildcard characters to match multiple resources.
+
+#### Tips:
+1. Test and Validate Policies: Before applying a JSON policy to an S3 bucket, test and validate it using tools like IAM Policy Simulator. This helps ensure that the policy behaves as intended and provides the desired access control.
+2. Follow the Principle of Least Privilege: When crafting JSON policies, adhere to the principle of least privilege. Grant only the necessary permissions required for the intended actions, minimizing the risk of accidental or unauthorized access to your S3 resources.
+3. Regularly Review and Update Policies: Periodically review and update your JSON policies to reflect changes in your access requirements and security standards. This helps maintain the integrity of your access control mechanisms and ensures they align with your organization's evolving needs.
+4. Utilize Policy Conditions: JSON policies allow you to specify conditions that must be met for the policy to take effect. Leverage policy conditions to enforce additional security controls, such as requiring requests to come from specific IP ranges or requiring the use of SSL/TLS encryption.
+
+##### Making object in S3 public
+1. Disable "Block all public access" option under Bucket > Permission 
+2. Add a bucket policy which allows "GetObject" by all resources on the bucket
+
+![](https://i.imgur.com/mkyJBp4.png)
+
+You can learn more about JSON-based policies and how they work with S3 by visiting the official [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-bucket-user-policy-specifying-principal-intro.html)
+

@@ -180,3 +180,26 @@ You can add a lifecycle rule in the management section of a bucket which lets yo
 4. Monitor and adjust storage classes: Regularly monitor your data access patterns and make adjustments to the storage class as needed. This ensures that your data remains stored in the most cost-effective and appropriate storage class based on its changing requirements.
 
 You can learn more about S3 storage classes, their features, and pricing details by visiting the official [AWS documentation](https://aws.amazon.com/s3/storage-classes/)
+
+
+### AWS EC2 Instance Metadata
+Amazon EC2 (Elastic Compute Cloud) provides a feature called instance metadata, which allows EC2 instances to access and retrieve information about themselves and their environment. Instance metadata provides a simple HTTP endpoint that EC2 instances can query to retrieve valuable information dynamically. This metadata can be useful for automating configurations, obtaining instance-specific details, and facilitating interactions with other AWS services.
+
+#### Accessing Instance Metadata:
+To access instance metadata, EC2 instances can make an HTTP GET request to a specific URL: `http://169.254.169.254/latest/meta-data/`. The instance metadata endpoint is available within the EC2 instance's networking environment and does not require any special authentication or authorization. It provides a structured view of the instance's metadata, organized into different categories.
+
+#### Common Metadata Categories:
+1. Identity: Information about the instance's identity, such as the instance ID, instance type, and AWS account ID.
+2. Networking: Details related to the instance's network configuration, including public and private IP addresses, security groups, and MAC address.
+3. User Data: User-provided data that can be passed to an instance during launch. This can be useful for configuring the instance or passing custom initialization scripts.
+4. Security: Security-related metadata, including IAM role information and temporary security credentials associated with the instance.
+5. Placement: Information about the placement of the instance, such as the availability zone and region.
+6. Block Device Mapping: Details about the block devices attached to the instance, including their volume IDs and device names.
+
+#### Tips:
+1. Retrieving Metadata: To retrieve specific metadata, append the desired category and attribute to the base metadata URL. For example, to retrieve the instance ID, make an HTTP GET request to http://169.254.169.254/latest/meta-data/instance-id.
+2. Automation and Configuration: Instance metadata can be leveraged during automation and configuration processes, allowing scripts or applications running on the instance to dynamically adapt based on the retrieved metadata.
+3. Use with Caution: Ensure that you carefully handle and secure any sensitive information obtained from instance metadata, as it can potentially expose sensitive details about the instance and its environment.
+4. Metadata Versioning: The instance metadata service may introduce updates or changes. Check the AWS documentation for information on metadata versions and any associated changes.
+
+You can learn more about EC2 instance metadata, available metadata categories, and how to use it effectively by visiting the official [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)

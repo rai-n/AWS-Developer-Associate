@@ -134,6 +134,11 @@ To get started with a specific AWS SDK, refer to the official [AWS SDK documenta
 
 ### AWS Exponential Backoff and Service Limits
 Exponential backoff is a technique used by AWS and other web services to handle retrying failed requests in a more efficient and reliable manner. When a request to an AWS service fails due to factors such as rate limiting, network issues, or service throttling, exponential backoff helps to manage retries by gradually increasing the time between subsequent retry attempts.
+* If you get *ThrottlingException* intermittently, use exponential backoff to gradually increase time between retries
+* Retry mechanism are already included in AWS SDK API calls
+* However you must implement the retry mechanism yourself if you are using AWS API as-if or in specific cases which may include:
+    1. Implementing retries on 5xx server errors and throttling
+    2. You should not implement on 4xx client errors
 
 #### Here's how exponential backoff works:
 1. Initial Retry: When a request fails, the client should wait for a short period before retrying the request.

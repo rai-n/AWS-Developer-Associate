@@ -2,6 +2,28 @@
 ### AWS EC2 Instance Metadata
 Amazon EC2 (Elastic Compute Cloud) provides a feature called instance metadata, which allows EC2 instances to access and retrieve information about themselves and their environment. Instance metadata provides a simple HTTP endpoint that EC2 instances can query to retrieve valuable information dynamically. This metadata can be useful for automating configurations, obtaining instance-specific details, and facilitating interactions with other AWS services.
 
+#### IMDSv2 vs IMDSv1 (Instance metadata service)
+* IMDSv1 is `http://169.254.169.254/latest/meta-data` directly
+* IMDSv2 is more secure and is done in two steps
+
+1. Get Session Token (limited validity) - using headers & PUT
+    
+```
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/
+```
+
+![](https://i.imgur.com/2YZMkSp.png)
+![](https://i.imgur.com/l78NhnM.png)
+
+2. Attached an IAM role to the EC2 instance adn you can access EC2 access key, secret access key and token as well as expiration date for token. IAM role provides credentials through the EC2 instance metadata service
+
+```
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/identity-credentials/ec2/security-credentials/
+```
+
+![](https://i.imgur.com/0d01soZ.png)
+
 #### Accessing Instance Metadata:
 To access instance metadata, EC2 instances can make an HTTP GET request to a specific URL: `http://169.254.169.254/latest/meta-data/`. The instance metadata endpoint is available within the EC2 instance's networking environment and does not require any special authentication or authorization. It provides a structured view of the instance's metadata, organized into different categories.
 
@@ -109,6 +131,28 @@ The AWS SDK (Software Development Kit) is a collection of software libraries and
 5. The AWS SDKs provide a comprehensive set of tools and resources to accelerate development and enable seamless integration with AWS services. Whether you're building web applications, mobile apps, or serverless architectures, the AWS SDKs streamline the process of leveraging AWS services in your applications.
 
 To get started with a specific AWS SDK, refer to the official [AWS SDK documentation](https://aws.amazon.com/developer/tools/)
+
+### AWS Exponential Backoff and Service Limits
+Exponential backoff is a technique used by AWS and other web services to handle retrying failed requests in a more efficient and reliable manner. When a request to an AWS service fails due to factors such as rate limiting, network issues, or service throttling, exponential backoff helps to manage retries by gradually increasing the time between subsequent retry attempts.
+
+#### Here's how exponential backoff works:
+1. Initial Retry: When a request fails, the client should wait for a short period before retrying the request.
+2. Exponential Increase: If the initial retry fails, the client should exponentially increase the waiting time between each subsequent retry attempt. This helps to reduce the likelihood of overwhelming the service and allows for temporary issues to resolve.
+3. Jitter: To avoid the "thundering herd" effect, where multiple clients retry simultaneously and overload the service, introducing a random jitter or slight variation in the waiting time is recommended. This ensures that the retry attempts from different clients are spread out.
+4. Maximum Retries: There should be a maximum limit on the number of retries attempted. If the maximum number of retries is reached and the request still fails, the client should handle the failure accordingly.
+5. By implementing exponential backoff, applications can handle intermittent failures more gracefully and reduce the chances of overwhelming the service during periods of high load or temporary issues.
+
+#### Service Limits:
+1. AWS enforces various service limits to maintain fair usage, ensure availability, and prevent abuse. These limits define constraints on resources or actions within specific AWS services. Service limits vary across different AWS services and can include limits on the number of API requests, storage capacity, concurrent connections, rate limits, and more.
+2. It's important to be aware of the service limits for the AWS services you use, as exceeding these limits can lead to service interruptions, throttling, or even account suspension. 
+3. To effectively manage service limits, consider the following:
+    1. Monitor and Track: Regularly monitor and track your resource usage to ensure you stay within the specified service limits. AWS provides various tools and services, such as CloudWatch, Trusted Advisor, and Service Quotas, to help monitor resource utilization and provide visibility into your limits.
+    2. Request Limit Increases: If you anticipate needing higher limits to accommodate your workload, you can request a limit increase through the AWS Support Center or via the AWS Management Console. Provide detailed justification for your request, including projected resource usage, expected growth, and any special requirements.
+    3. Design for Scalability: Architect your applications and infrastructure with scalability in mind. By designing for horizontal scalability and distributing workloads across multiple resources, you can effectively mitigate the impact of service limits and handle increased demand.
+    4. Optimize Resource Usage: Optimize your resource usage to make the most of the allocated limits. Remove any unnecessary resources or orphaned objects, ensure efficient data storage practices, and review your application code for any inefficiencies that may lead to excessive resource utilization.
+    5. By understanding and managing service limits, you can ensure that your applications and services operate within the defined boundaries, maintain consistent performance, and avoid disruptions due to exceeding service limits.
+
+To learn more about specific service limits for AWS services and how to manage them effectively, consult the official [AWS documentation](https://aws.amazon.com/documentation/service-limits/)
 
 ### AWS Credential Provider and Credential Chain
 In AWS, credentials are required to authenticate and authorize access to AWS services and resources. The AWS Credential Provider is a component that securely manages and supplies the necessary credentials to AWS SDKs, CLI, and other AWS tools. It supports various authentication methods and allows you to configure and manage multiple sets of credentials.
